@@ -17,41 +17,115 @@ function processFile() {
     reader.readAsText(file);
 }
 
+// Función para formatear el valor en pesos colombianos
+function formatCOP(value) {
+    return '$' + value.toLocaleString('es-CO', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+// Función para formatear la fecha de YYYYMMDD a YYYY-MM-DD
+function formatDate(dateStr) {
+    if (dateStr.length === 8) {
+        return `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+    }
+    return dateStr;
+}
+
+// Función para obtener el nombre del establecimiento
+function getEstablecimiento(uniqueCode, tipoMovimiento) {
+    // Caso especial: código 00000000
+    if (uniqueCode === "00000000") {
+        if (tipoMovimiento && tipoMovimiento.toUpperCase().includes("CARGOS")) {
+            return "DESCARGA TARJETA COMFACAUCA";
+        } else if (tipoMovimiento && tipoMovimiento.toUpperCase().includes("ABONO")) {
+            return "CARGA TARJETA COMFACAUCA";
+        }
+        return "SIN COMERCIO";
+    }
+
+    // Eliminar los dos primeros ceros del código
+    let codigoLimpio = uniqueCode;
+    if (codigoLimpio.startsWith("00")) {
+        codigoLimpio = codigoLimpio.substring(2);
+    }
+
+    const nombre = comercios[codigoLimpio];
+    return nombre || "NO ENCONTRADO";
+}
+
 function processData(content) {
-    data = []; // Limpiamos los datos anteriores
+    data = [];
     const lines = content.split('\n');
 
-    // Procesar cada línea del archivo
     lines.forEach(line => {
         if (line.trim() !== '') {
             const cardNumber = line.substring(9, 26).trim();
             const rawValue = parseFloat(line.substring(124, 139).replace(/^0+/, '').trim().replace(/,/g, ""));
-            const formattedValue = rawValue.toLocaleString('es-ES', { minimumFractionDigits: 2 });
             const date = line.substring(158, 166).trim();
             const uniqueCode = line.substring(333, 341).trim();
 
+            let tipoMovimiento = "";
+            if (line.includes("CARGOS")) {
+                tipoMovimiento = "CARGOS";
+            } else if (line.includes("ABONO")) {
+                tipoMovimiento = "ABONO";
+            }
+
             if (!isNaN(rawValue)) {
-                data.push({ cardNumber, value: formattedValue, rawValue, date, uniqueCode });
+                const establecimiento = getEstablecimiento(uniqueCode, tipoMovimiento);
+                // Formatear valor y fecha
+                const formattedValue = formatCOP(rawValue);
+                const formattedDate = formatDate(date);
+
+                data.push({
+                    cardNumber,
+                    value: formattedValue,
+                    rawValue,
+                    date: formattedDate, // Guardamos la fecha formateada
+                    originalDate: date, // Guardamos la fecha original por si se necesita
+                    uniqueCode,
+                    establecimiento,
+                    tipoMovimiento
+                });
             }
         }
     });
 
-    // Ordenar los datos por fecha
     sortDataByDate();
-
-    // Mostrar los datos en la tabla
     renderTable();
-
-    // Calcular y mostrar el total del valor
     calculateTotal();
 }
 
-// Función para ordenar los datos por fecha
+// Función para ordenar los datos por fecha y luego por establecimiento
 function sortDataByDate() {
     data.sort((a, b) => {
-        const dateA = `${a.date.slice(0, 4)}${a.date.slice(4, 6)}${a.date.slice(6, 8)}`;
-        const dateB = `${b.date.slice(0, 4)}${b.date.slice(4, 6)}${b.date.slice(6, 8)}`;
-        return parseInt(dateA) - parseInt(dateB);
+        // Usar la fecha original para ordenar
+        const dateA = `${a.originalDate.slice(0, 4)}${a.originalDate.slice(4, 6)}${a.originalDate.slice(6, 8)}`;
+        const dateB = `${b.originalDate.slice(0, 4)}${b.originalDate.slice(4, 6)}${b.originalDate.slice(6, 8)}`;
+        const dateCompare = parseInt(dateA) - parseInt(dateB);
+
+        if (dateCompare !== 0) {
+            return dateCompare;
+        }
+
+        const getPriority = (est) => {
+            if (est === "CARGA TARJETA COMFACAUCA" ||
+                est === "DESCARGA TARJETA COMFACAUCA") {
+                return 1;
+            }
+            return 0;
+        };
+
+        const priorityA = getPriority(a.establecimiento);
+        const priorityB = getPriority(b.establecimiento);
+
+        if (priorityA !== priorityB) {
+            return priorityA - priorityB;
+        }
+
+        return a.establecimiento.localeCompare(b.establecimiento);
     });
 }
 
@@ -60,9 +134,8 @@ function renderTable() {
     const tableBody = document.getElementById('dataBody');
     tableBody.innerHTML = '';
 
-    const dates = Array.from(new Set(data.map(item => item.date))); // Obtener fechas únicas
+    const dates = Array.from(new Set(data.map(item => item.date)));
 
-    // Mostrar los datos agrupados por fecha
     dates.forEach(date => {
         const filteredData = data.filter(item => item.date === date);
         filteredData.forEach(item => {
@@ -72,15 +145,15 @@ function renderTable() {
                 <td>${item.value}</td>
                 <td>${item.date}</td>
                 <td>${item.uniqueCode}</td>
+                <td>${item.establecimiento}</td>
             `;
         });
 
-        // Insertar una fila para el total de cada fecha
         const total = filteredData.reduce((acc, item) => acc + item.rawValue, 0);
         const totalRow = tableBody.insertRow();
         totalRow.innerHTML = `
-            <td colspan="3">Total ${date}</td>
-            <td>${total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}</td>
+            <td colspan="4">Total: ${date}</td>
+            <td>${formatCOP(total)}</td>
         `;
         totalRow.style.fontWeight = 'bold';
         totalRow.style.backgroundColor = '#f2f2f2';
@@ -90,12 +163,14 @@ function renderTable() {
 // Función para calcular el total de todos los datos
 function calculateTotal() {
     const totalValue = data.reduce((acc, item) => acc + item.rawValue, 0);
-    document.getElementById('totalValue').textContent = totalValue.toLocaleString('es-ES', { minimumFractionDigits: 2 });
+    document.getElementById('totalValue').textContent = formatCOP(totalValue);
 }
 
-//Función para limpiar la tabla
+// Función para limpiar la tabla y el archivo seleccionado
 function clearTable() {
-    data = []; // Limpiamos los datos
+    data = [];
+    const fileInput = document.getElementById('fileInput');
+    fileInput.value = '';
     document.getElementById('dataBody').innerHTML = '';
     document.getElementById('totalValue').textContent = '';
 }
@@ -108,15 +183,16 @@ function exportToCSV() {
     }
 
     const csvContent = "data:text/csv;charset=utf-8,"
-        + data.map(item => `${item.cardNumber},${item.rawValue},${item.date},${item.uniqueCode}`).join('\n');
+        + "No. de Tarjeta,Valor,Fecha,Código Único,Establecimiento\n"
+        + data.map(item => `${item.cardNumber},${item.rawValue},${item.date},${item.uniqueCode},"${item.establecimiento}"`).join('\n');
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "data.csv");
-    document.body.appendChild(link); // Requerido para Firefox
-
-    link.click(); // Esto descargará el archivo de datos llamado "data.csv"
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // Función para exportar los datos a Excel
@@ -128,10 +204,11 @@ function exportToExcel() {
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data.map(item => ({
-        cardNumber: item.cardNumber,
-        value: item.rawValue,
-        date: item.date,
-        uniqueCode: item.uniqueCode
+        "No. de Tarjeta": item.cardNumber,
+        "Valor": item.rawValue,
+        "Fecha": item.date,
+        "Código Único": item.uniqueCode,
+        "Establecimiento": item.establecimiento
     })));
     XLSX.utils.book_append_sheet(wb, ws, "Data");
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -141,9 +218,7 @@ function exportToExcel() {
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', 'data.xlsx');
-    document.body.appendChild(link); // Requerido para Firefox
-
-    link.click(); // Esto descargará el archivo de datos llamado "data.xlsx"
-    document.body.removeChild(link); // Limpiar
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
-
