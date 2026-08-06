@@ -42,6 +42,16 @@ function processData(content) {
     calculateTotal();
 }
 
+// MODIFICADO: Formatea un número como pesos colombianos con 2 decimales SIEMPRE
+function formatCOP(value) {
+    return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 2, // MODIFICADO: de 0 a 2
+        maximumFractionDigits: 2  // MODIFICADO: de 0 a 2
+    }).format(value);
+}
+
 function renderTable() {
     const tableBody = document.getElementById('dataBody');
     tableBody.innerHTML = '';
@@ -50,7 +60,7 @@ function renderTable() {
         const row = tableBody.insertRow();
         row.innerHTML = `
             <td>${item.documentNumber}</td>
-            <td>${item.value}</td>
+            <td>${formatCOP(item.value)}</td>
             <td>${item.commerce}</td>
         `;
     });
@@ -59,17 +69,41 @@ function renderTable() {
 function calculateTotal() {
     const totalValue = data.reduce((acc, item) => acc + item.value, 0);
 
-    // Mostrar el total en la tabla (ya existente)
-    document.getElementById('totalValue').textContent = totalValue.toLocaleString('de-DE', { minimumFractionDigits: 2 });
-
-    // Mostrar el total en el nuevo div
-    document.getElementById('totalProcessedValue').textContent = totalValue.toLocaleString('de-DE', { minimumFractionDigits: 2 });
+    document.getElementById('totalValue').textContent = formatCOP(totalValue);
+    document.getElementById('totalProcessedValue').textContent = formatCOP(totalValue);
 }
 
 function clearTable() {
-    data = []; // Limpiamos los datos
+    // 1. Limpiar los datos
+    data = [];
+
+    // 2. Limpiar la tabla
     document.getElementById('dataBody').innerHTML = '';
+
+    // 3. Limpiar los totales
     document.getElementById('totalValue').textContent = '';
+    document.getElementById('totalProcessedValue').textContent = '';
+
+    // 4. Limpiar el input file (resetear el valor)
+    const fileInput = document.getElementById('fileInput');
+    fileInput.value = '';
+
+    // 5. Limpiar el nombre del archivo mostrado
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    if (fileNameDisplay) {
+        fileNameDisplay.textContent = '';
+    }
+
+    // 6. Si usas un label personalizado para el input file
+    const fileLabel = document.querySelector('label[for="fileInput"]');
+    if (fileLabel) {
+        const originalText = fileLabel.getAttribute('data-original-text');
+        if (originalText) {
+            fileLabel.textContent = originalText;
+        } else {
+            fileLabel.textContent = 'Seleccionar archivo';
+        }
+    }
 }
 
 function exportToCSV() {
@@ -79,15 +113,21 @@ function exportToCSV() {
     }
 
     const csvContent = "data:text/csv;charset=utf-8,"
-        + data.map(item => Object.values(item).join(',')).join('\n');
+        + data.map(item => {
+            const formattedItem = {
+                documentNumber: item.documentNumber,
+                value: formatCOP(item.value),
+                commerce: item.commerce
+            };
+            return Object.values(formattedItem).join(',');
+        }).join('\n');
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "data.csv");
-    document.body.appendChild(link); // Required for FF
-
-    link.click(); // This will download the data file named "data.csv".
+    document.body.appendChild(link);
+    link.click();
 }
 
 function exportToExcel() {
@@ -96,10 +136,42 @@ function exportToExcel() {
         return;
     }
 
-    const ws = XLSX.utils.json_to_sheet(data);
+    const formattedData = data.map(item => ({
+        documentNumber: item.documentNumber,
+        value: formatCOP(item.value),
+        commerce: item.commerce
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(formattedData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Datos");
     XLSX.writeFile(wb, "data.xlsx");
 }
 
+function updateFileName(input) {
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const fileLabel = document.querySelector('label[for="fileInput"]');
 
+    if (input.files && input.files[0]) {
+        const fileName = input.files[0].name;
+
+        if (fileNameDisplay) {
+            fileNameDisplay.textContent = fileName;
+        }
+
+        if (fileLabel) {
+            if (!fileLabel.getAttribute('data-original-text')) {
+                fileLabel.setAttribute('data-original-text', fileLabel.textContent);
+            }
+            fileLabel.textContent = fileName;
+        }
+    } else {
+        if (fileNameDisplay) {
+            fileNameDisplay.textContent = '';
+        }
+        if (fileLabel) {
+            const originalText = fileLabel.getAttribute('data-original-text');
+            fileLabel.textContent = originalText || 'Seleccionar archivo';
+        }
+    }
+}
