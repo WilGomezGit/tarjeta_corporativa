@@ -154,7 +154,7 @@ function renderTable() {
         const total = filteredData.reduce((acc, item) => acc + item.rawValue, 0);
         const totalRow = tableBody.insertRow();
         totalRow.innerHTML = `
-            <td colspan="5" style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Total: ${date}</td>
+            <td colspan="5" style="text-align: center; font-weight: bold; background-color: #f2f2f2;">TOTAL DIA: ${date}</td>
             <td style="text-align: center; font-weight: bold; background-color: #f2f2f2;">${formatCOP(total)}</td>
         `;
         totalRow.style.fontWeight = 'bold';
@@ -171,7 +171,7 @@ function calculateTotal() {
     const tableBody = document.getElementById('dataBody');
     const totalRow = tableBody.insertRow();
     totalRow.innerHTML = `
-        <td colspan="6" style="text-align: center; font-weight: bold; background-color: #e8e8e8;">TOTAL GENERAL: ${formatCOP(totalValue)}</td>
+        <td colspan="6" style="text-align: center; font-weight: bold; background-color: #e8e8e8;">TOTAL ARCHIVO:  ${formatCOP(totalValue)}</td>
     `;
     totalRow.style.fontWeight = 'bold';
     totalRow.style.backgroundColor = '#e8e8e8';
