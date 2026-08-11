@@ -75,7 +75,6 @@ function processData(content) {
 
             if (!isNaN(rawValue)) {
                 const establecimiento = getEstablecimiento(uniqueCode, tipoMovimiento);
-                // Formatear valor y fecha
                 const formattedValue = formatCOP(rawValue);
                 const formattedDate = formatDate(date);
 
@@ -83,8 +82,8 @@ function processData(content) {
                     cardNumber,
                     value: formattedValue,
                     rawValue,
-                    date: formattedDate, // Guardamos la fecha formateada
-                    originalDate: date, // Guardamos la fecha original por si se necesita
+                    date: formattedDate,
+                    originalDate: date,
                     uniqueCode,
                     establecimiento,
                     tipoMovimiento
@@ -101,7 +100,6 @@ function processData(content) {
 // Función para ordenar los datos por fecha y luego por establecimiento
 function sortDataByDate() {
     data.sort((a, b) => {
-        // Usar la fecha original para ordenar
         const dateA = `${a.originalDate.slice(0, 4)}${a.originalDate.slice(4, 6)}${a.originalDate.slice(6, 8)}`;
         const dateB = `${b.originalDate.slice(0, 4)}${b.originalDate.slice(4, 6)}${b.originalDate.slice(6, 8)}`;
         const dateCompare = parseInt(dateA) - parseInt(dateB);
@@ -134,6 +132,8 @@ function renderTable() {
     const tableBody = document.getElementById('dataBody');
     tableBody.innerHTML = '';
 
+    let rowNumber = 1;
+
     const dates = Array.from(new Set(data.map(item => item.date)));
 
     dates.forEach(date => {
@@ -141,19 +141,21 @@ function renderTable() {
         filteredData.forEach(item => {
             const row = tableBody.insertRow();
             row.innerHTML = `
+                <td>${rowNumber}</td>
                 <td>${item.cardNumber}</td>
                 <td>${item.value}</td>
                 <td>${item.date}</td>
                 <td>${item.uniqueCode}</td>
                 <td>${item.establecimiento}</td>
             `;
+            rowNumber++;
         });
 
         const total = filteredData.reduce((acc, item) => acc + item.rawValue, 0);
         const totalRow = tableBody.insertRow();
         totalRow.innerHTML = `
-            <td colspan="4">Total: ${date}</td>
-            <td>${formatCOP(total)}</td>
+            <td colspan="5" style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Total: ${date}</td>
+            <td style="text-align: center; font-weight: bold; background-color: #f2f2f2;">${formatCOP(total)}</td>
         `;
         totalRow.style.fontWeight = 'bold';
         totalRow.style.backgroundColor = '#f2f2f2';
@@ -163,7 +165,19 @@ function renderTable() {
 // Función para calcular el total de todos los datos
 function calculateTotal() {
     const totalValue = data.reduce((acc, item) => acc + item.rawValue, 0);
-    document.getElementById('totalValue').textContent = formatCOP(totalValue);
+    const totalElement = document.getElementById('totalValue');
+
+    // Crear una fila completa para el total general
+    const tableBody = document.getElementById('dataBody');
+    const totalRow = tableBody.insertRow();
+    totalRow.innerHTML = `
+        <td colspan="6" style="text-align: center; font-weight: bold; background-color: #e8e8e8;">TOTAL GENERAL: ${formatCOP(totalValue)}</td>
+    `;
+    totalRow.style.fontWeight = 'bold';
+    totalRow.style.backgroundColor = '#e8e8e8';
+
+    // Limpiar el totalValue del tfoot ya que ahora está en el body
+    totalElement.textContent = '';
 }
 
 // Función para limpiar la tabla y el archivo seleccionado
@@ -182,9 +196,12 @@ function exportToCSV() {
         return;
     }
 
-    const csvContent = "data:text/csv;charset=utf-8,"
-        + "No. de Tarjeta,Valor,Fecha,Código Único,Establecimiento\n"
-        + data.map(item => `${item.cardNumber},${item.rawValue},${item.date},${item.uniqueCode},"${item.establecimiento}"`).join('\n');
+    let csvContent = "data:text/csv;charset=utf-8,"
+        + "N°,No. de Tarjeta,Valor,Fecha,Código Único,Establecimiento\n";
+
+    data.forEach((item, index) => {
+        csvContent += `${index + 1},${item.cardNumber},${item.rawValue},${item.date},${item.uniqueCode},"${item.establecimiento}"\n`;
+    });
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -203,7 +220,8 @@ function exportToExcel() {
     }
 
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(data.map(item => ({
+    const ws = XLSX.utils.json_to_sheet(data.map((item, index) => ({
+        "N°": index + 1,
         "No. de Tarjeta": item.cardNumber,
         "Valor": item.rawValue,
         "Fecha": item.date,
