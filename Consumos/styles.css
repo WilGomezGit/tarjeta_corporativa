@@ -29,13 +29,13 @@ button:hover {
     opacity: 0.8;
 }
 
-/* Estilos específicos para los botones de acción */
+/* Estilos especÃ­ficos para los botones de acciÃ³n */
 .button {
-    background-color: #3498db; /* Color de fondo de los botones */
+    background-color: #3498db;
     color: white;
     border-radius: 5px;
     padding: 10px 20px;
-    margin: 10px; /* Ajusta el margen para separación */
+    margin: 10px;
 }
 
 .button:hover {
@@ -43,9 +43,9 @@ button:hover {
     opacity: 0.8;
 }
 
-/* Estilos para los botones de exportación */
+/* Estilos para los botones de exportaciÃ³n */
 .export-button {
-    background-color: #2ecc71; /* Verde claro */
+    background-color: #2ecc71;
     color: white;
     border-radius: 5px;
     margin-top: 10px;
@@ -64,7 +64,7 @@ button:hover {
     margin-top: 20px;
 }
 
-/* Estilos para el contenedor del título */
+/* Estilos para el contenedor del tÃ­tulo */
 .titleContainer {
     background-color: #e0e8f0;
     padding: 10px;
@@ -72,7 +72,7 @@ button:hover {
     text-align: center;
     margin-bottom: 20px;
     position: relative;
-    border: 1px solid #ddd; /* Borde gris claro alrededor del contenedor del título */
+    border: 1px solid #ddd;
 }
 
 /* Estilos para el contenedor del input y los botones */
@@ -81,10 +81,10 @@ button:hover {
     padding: 10px;
     border-radius: 10px;
     text-align: center;
-    margin: 20px auto; /* Centrar el contenedor */
+    margin: 20px auto;
     border: 1px solid #ddd;
-    width: 50%; /* Ajustar el ancho del contenedor */
-    max-width: 400px; /* Ancho máximo para pantallas grandes */
+    width: 50%;
+    max-width: 400px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -95,17 +95,17 @@ button:hover {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    width: 90%; /* Hacer que ocupe todo el ancho disponible */
-    max-width: 100%; /* Evitar que se desborde en pantallas pequeñas */
+    width: 90%;
+    max-width: 100%;
     font-size: 14px;
     background-color: #fff;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
     cursor: pointer;
 }
 
-/* Estilos para el botón home */
+/* Estilos para el botÃ³n home */
 .home-button {
-    background-color: #4CAF50; /* Verde */
+    background-color: #4CAF50;
     color: white;
     border: none;
     cursor: pointer;
@@ -126,19 +126,19 @@ button:hover {
     border-radius: 5px;
     border: 1px solid #ddd;
     margin-top: 20px;
-    width: 80%; /* Ajusta el ancho según sea necesario */
+    width: 80%;
     margin-left: auto;
-    margin-right: auto; /* Centra el contenedor en la página */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Añade una sombra */
+    margin-right: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Estilos para la tabla */
 .table-container {
-    width: 100%; /* Hace que la tabla ocupe todo el ancho del contenedor */
+    width: 100%;
 }
 
 table {
-    width: 100%; /* Hace que la tabla ocupe todo el ancho del contenedor */
+    width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
 }
@@ -173,7 +173,7 @@ tfoot {
 /* Estilos para los botones de scroll */
 .scrollButton {
     position: fixed;
-    background-color: #3498db; /* Color de fondo consistente */
+    background-color: #3498db;
     color: white;
     padding: 8px 16px;
     border: none;
@@ -194,4 +194,118 @@ tfoot {
 
 .smallButton {
     font-size: 14px;
+}
+
+/* ======================================== */
+/* ESTILOS PARA EL RESUMEN */
+/* ======================================== */
+.summary-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-height: 50px;
+    transition: all 0.3s ease;
+}
+
+/* Cuando el resumen estÃ¡ vacÃ­o, ocultar el borde y el fondo */
+.summary-container:empty {
+    display: none;
+}
+
+.summary-box h3 {
+    text-align: center;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 18px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-label {
+    font-weight: 500;
+    color: #34495e;
+}
+
+.summary-value {
+    font-weight: 600;
+    color: #2c3e50;
+    font-family: 'Courier New', monospace;
+}
+
+.total-row {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.total-row .summary-label {
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.total-row .summary-value {
+    font-size: 16px;
+    color: #e74c3c;
+}
+
+.summary-divider {
+    border-top: 2px dashed #bdc3c7;
+    margin: 8px 0;
+}
+
+/* ======================================== */
+/* RESPONSIVE */
+/* ======================================== */
+@media (max-width: 768px) {
+    .summary-container {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .summary-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .summary-label {
+        margin-bottom: 4px;
+    }
+    
+    .file-button-container {
+        width: 90%;
+    }
+    
+    .output-container {
+        width: 95%;
+        padding: 10px;
+    }
+    
+    table, th, td {
+        padding: 8px;
+        font-size: 12px;
+    }
 }
