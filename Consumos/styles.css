@@ -276,6 +276,45 @@ tfoot {
     margin: 8px 0;
 }
 
+/* Estilos para los diferentes totales en el resumen */
+.total-cargas .summary-value {
+    color: #e74c3c; /* Rojo para cargas-descargas */
+    font-weight: bold;
+}
+
+.total-archivo-menos .summary-value {
+    color: #f39c12; /* Naranja para archivo menos cargas */
+    font-weight: bold;
+}
+
+.total-archivo .summary-value {
+    color: #2980b9; /* Azul para total archivo */
+    font-weight: bold;
+}
+
+.total-registros .summary-value {
+    color: #8e44ad; /* Morado para registros */
+    font-weight: bold;
+}
+
+/* Estilo para la fila de total-archivo-menos */
+.total-archivo-menos {
+    background-color: #fef9e7;
+    border-radius: 3px;
+    padding: 6px 10px;
+}
+
+.total-archivo-menos .summary-label {
+    font-size: 15px;
+    color: #2c3e50;
+}
+
+.total-archivo-menos .summary-value {
+    font-size: 15px;
+    color: #f39c12;
+    font-weight: bold;
+}
+
 /* ======================================== */
 /* RESPONSIVE */
 /* ======================================== */
