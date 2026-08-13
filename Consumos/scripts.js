@@ -178,6 +178,9 @@ function renderSummary() {
     // Total cargas-descargas
     const totalCargasDescargas = totalCargas + totalDescargas;
 
+    // Total del archivo menos cargas-descargas
+    const totalArchivoMenosCargas = totalArchivo - totalCargasDescargas;
+
     // Total registros
     const totalRegistros = data.length;
 
@@ -188,7 +191,7 @@ function renderSummary() {
             <div class="summary-content">
     `;
 
-    // Agregar totales por día
+    // 1. Agregar totales por día
     sortedDates.forEach(date => {
         summaryHTML += `
             <div class="summary-row">
@@ -198,18 +201,34 @@ function renderSummary() {
         `;
     });
 
-    // Agregar totales generales
+    // 2. Total CARGAS-DESCARGAS
     summaryHTML += `
                 <div class="summary-divider"></div>
-                <div class="summary-row total-row">
+                <div class="summary-row total-cargas">
+                    <span class="summary-label">TOTAL CARGAS/DESCARGAS</span>
+                    <span class="summary-value">${formatCOP(totalCargasDescargas)}</span>
+                </div>
+    `;
+
+    // 3. Total del archivo menos cargas-descargas
+    summaryHTML += `
+                <div class="summary-row total-archivo-menos">
+                    <span class="summary-label">TOTAL ARCHIVO - CARGAS/DESCARGAS</span>
+                    <span class="summary-value">${formatCOP(totalArchivoMenosCargas)}</span>
+                </div>
+    `;
+
+    // 4. Total del archivo
+    summaryHTML += `
+                <div class="summary-row total-archivo">
                     <span class="summary-label">TOTAL ARCHIVO</span>
                     <span class="summary-value">${formatCOP(totalArchivo)}</span>
                 </div>
-                <div class="summary-row">
-                    <span class="summary-label">TOTAL CARGAS-DESCARGAS</span>
-                    <span class="summary-value">${formatCOP(totalCargasDescargas)}</span>
-                </div>
-                <div class="summary-row">
+    `;
+
+    // 5. Total registros
+    summaryHTML += `
+                <div class="summary-row total-registros">
                     <span class="summary-label">TOTAL REGISTROS</span>
                     <span class="summary-value">${totalRegistros}</span>
                 </div>
