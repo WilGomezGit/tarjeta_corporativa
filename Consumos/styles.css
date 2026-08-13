@@ -3,8 +3,8 @@ body {
     background-color: #f0f0f0;
     margin: 20px;
     padding: 0;
-    background-image: url('../imagen/fondo.jpg'); /* Cambia esto a la ruta de tu imagen */
-    background-repeat: repeat; /* Repite la imagen en mosaico */
+    background-image: url('../imagen/fondo.jpg');
+    background-repeat: repeat;
 }
 
 h1 {
@@ -154,8 +154,20 @@ thead {
     color: white;
 }
 
+/* RESALTAR FILAS AL PASAR EL MOUSE */
 tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: #d4edda !important;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Filas alternas con color */
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:nth-child(even):hover {
+    background-color: #d4edda !important;
 }
 
 tfoot {
@@ -212,7 +224,6 @@ tfoot {
     transition: all 0.3s ease;
 }
 
-/* Cuando el resumen está vacío, ocultar el borde y el fondo */
 .summary-container:empty {
     display: none;
 }
@@ -276,28 +287,26 @@ tfoot {
     margin: 8px 0;
 }
 
-/* Estilos para los diferentes totales en el resumen */
 .total-cargas .summary-value {
-    color: #e74c3c; /* Rojo para cargas-descargas */
+    color: #e74c3c;
     font-weight: bold;
 }
 
 .total-archivo-menos .summary-value {
-    color: #f39c12; /* Naranja para archivo menos cargas */
+    color: #f39c12;
     font-weight: bold;
 }
 
 .total-archivo .summary-value {
-    color: #2980b9; /* Azul para total archivo */
+    color: #2980b9;
     font-weight: bold;
 }
 
 .total-registros .summary-value {
-    color: #8e44ad; /* Morado para registros */
+    color: #8e44ad;
     font-weight: bold;
 }
 
-/* Estilo para la fila de total-archivo-menos */
 .total-archivo-menos {
     background-color: #fef9e7;
     border-radius: 3px;
