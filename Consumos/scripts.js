@@ -30,29 +30,22 @@ function processFile() {
 
 // Función para validar el nombre del archivo
 function validateFileName(fileName) {
-    // Eliminar la extensión del archivo
     const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
 
-    // Verificar que el nombre comience con "T636876"
     if (!nameWithoutExtension.startsWith('T636876')) {
         return false;
     }
 
-    // Obtener la parte después de T636876
     const suffix = nameWithoutExtension.substring(7);
 
-    // Validar el sufijo según el formato esperado
-    // Caso 1: 3 dígitos (mes y día) para meses 1-9 (ej: T636876811)
     if (/^\d{3}$/.test(suffix)) {
         const month = parseInt(suffix.substring(0, 1));
         const day = parseInt(suffix.substring(1, 3));
 
-        // Validar mes (1-9)
         if (month < 1 || month > 9) {
             return false;
         }
 
-        // Validar día (1-31)
         if (day < 1 || day > 31) {
             return false;
         }
@@ -60,12 +53,9 @@ function validateFileName(fileName) {
         return true;
     }
 
-    // Caso 2: Letra (A, B, C) + 2 dígitos para meses 10, 11, 12 (ej: T636876A01, T636876B15, T636876C20)
     if (/^[ABC]\d{2}$/.test(suffix)) {
-        const monthLetter = suffix.substring(0, 1);
         const day = parseInt(suffix.substring(1, 3));
 
-        // Validar día (1-31)
         if (day < 1 || day > 31) {
             return false;
         }
@@ -73,7 +63,6 @@ function validateFileName(fileName) {
         return true;
     }
 
-    // Si no cumple con ningún formato, es inválido
     return false;
 }
 
@@ -95,7 +84,6 @@ function formatDate(dateStr) {
 
 // Función para obtener el nombre del establecimiento
 function getEstablecimiento(uniqueCode, tipoMovimiento) {
-    // Caso especial: código 00000000
     if (uniqueCode === "00000000") {
         if (tipoMovimiento && tipoMovimiento.toUpperCase().includes("CARGOS")) {
             return "DESCARGA TARJETA COMFACAUCA";
@@ -105,7 +93,6 @@ function getEstablecimiento(uniqueCode, tipoMovimiento) {
         return "SIN COMERCIO";
     }
 
-    // Eliminar los dos primeros ceros del código
     let codigoLimpio = uniqueCode;
     if (codigoLimpio.startsWith("00")) {
         codigoLimpio = codigoLimpio.substring(2);
@@ -153,8 +140,84 @@ function processData(content) {
     });
 
     sortDataByDate();
+    renderSummary(); // Mostrar el resumen
     renderTable();
     calculateTotal();
+}
+
+// Función para mostrar el resumen del archivo
+function renderSummary() {
+    const summaryContainer = document.getElementById('summaryContainer');
+
+    // Calcular totales por día
+    const totalsByDate = {};
+    let totalCargas = 0;
+    let totalDescargas = 0;
+
+    data.forEach(item => {
+        // Sumar por fecha
+        if (!totalsByDate[item.date]) {
+            totalsByDate[item.date] = 0;
+        }
+        totalsByDate[item.date] += item.rawValue;
+
+        // Sumar cargas y descargas
+        if (item.establecimiento === "CARGA TARJETA COMFACAUCA") {
+            totalCargas += item.rawValue;
+        } else if (item.establecimiento === "DESCARGA TARJETA COMFACAUCA") {
+            totalDescargas += item.rawValue;
+        }
+    });
+
+    // Ordenar las fechas
+    const sortedDates = Object.keys(totalsByDate).sort();
+
+    // Calcular total del archivo
+    const totalArchivo = data.reduce((acc, item) => acc + item.rawValue, 0);
+
+    // Total cargas-descargas
+    const totalCargasDescargas = totalCargas + totalDescargas;
+
+    // Total registros
+    const totalRegistros = data.length;
+
+    // Construir el HTML del resumen
+    let summaryHTML = `
+        <div class="summary-box">
+            <h3>RESUMEN ARCHIVO CONSUMOS CARGADO</h3>
+            <div class="summary-content">
+    `;
+
+    // Agregar totales por día
+    sortedDates.forEach(date => {
+        summaryHTML += `
+            <div class="summary-row">
+                <span class="summary-label">TOTAL DÍA: ${date}</span>
+                <span class="summary-value">${formatCOP(totalsByDate[date])}</span>
+            </div>
+        `;
+    });
+
+    // Agregar totales generales
+    summaryHTML += `
+                <div class="summary-divider"></div>
+                <div class="summary-row total-row">
+                    <span class="summary-label">TOTAL ARCHIVO</span>
+                    <span class="summary-value">${formatCOP(totalArchivo)}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">TOTAL CARGAS-DESCARGAS</span>
+                    <span class="summary-value">${formatCOP(totalCargasDescargas)}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">TOTAL REGISTROS</span>
+                    <span class="summary-value">${totalRegistros}</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    summaryContainer.innerHTML = summaryHTML;
 }
 
 // Función para ordenar los datos por fecha y luego por establecimiento
@@ -225,31 +288,41 @@ function renderTable() {
 // Función para calcular el total de todos los datos
 function calculateTotal() {
     const totalValue = data.reduce((acc, item) => acc + item.rawValue, 0);
-    const totalElement = document.getElementById('totalValue');
 
     // Crear una fila completa para el total general
     const tableBody = document.getElementById('dataBody');
-    const totalRow = tableBody.insertRow();
-    totalRow.innerHTML = `
-        <td colspan="6" style="text-align: center; font-weight: bold; background-color: #e8e8e8;">TOTAL ARCHIVO: ${formatCOP(totalValue)}</td>
-    `;
-    totalRow.style.fontWeight = 'bold';
-    totalRow.style.backgroundColor = '#e8e8e8';
+    if (tableBody) {
+        const totalRow = tableBody.insertRow();
+        totalRow.innerHTML = `
+            <td colspan="6" style="text-align: center; font-weight: bold; background-color: #e8e8e8;">TOTAL ARCHIVO: ${formatCOP(totalValue)}</td>
+        `;
+        totalRow.style.fontWeight = 'bold';
+        totalRow.style.backgroundColor = '#e8e8e8';
+    }
 
-    // Limpiar el totalValue del tfoot ya que ahora está en el body
-    totalElement.textContent = '';
+    // Ya no intentamos usar totalValue porque lo eliminamos del HTML
 }
-
 // Función para limpiar la tabla y el archivo seleccionado
 function clearTable() {
     data = [];
     const fileInput = document.getElementById('fileInput');
-    fileInput.value = '';
-    document.getElementById('dataBody').innerHTML = '';
-    document.getElementById('totalValue').textContent = '';
-}
+    if (fileInput) {
+        fileInput.value = '';
+    }
 
-// Función para exportar los datos a CSV
+    const dataBody = document.getElementById('dataBody');
+    if (dataBody) {
+        dataBody.innerHTML = '';
+    }
+
+    // Limpiar el resumen
+    const summaryContainer = document.getElementById('summaryContainer');
+    if (summaryContainer) {
+        summaryContainer.innerHTML = '';
+    }
+
+    // Nota: No intentamos limpiar totalValue porque ya no existe en el HTML
+}// Función para exportar los datos a CSV
 function exportToCSV() {
     if (data.length === 0) {
         alert('No hay datos para exportar.');
