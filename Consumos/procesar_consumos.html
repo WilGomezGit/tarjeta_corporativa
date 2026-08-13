@@ -20,13 +20,16 @@
         </div>
     </div>
 
+    <!-- Contenedor del resumen -->
+    <div id="summaryContainer" class="summary-container"></div>
+
     <!-- Contenedor de salida para la tabla -->
     <div class="output-container">
         <div class="table-container">
             <table id="dataTable" class="styled-table">
                 <thead>
                     <tr>
-                  		<th>N°</th>
+                        <th>N°</th>
                         <th>No. de Tarjeta</th>
                         <th>Valor</th>
                         <th>Fecha</th>
@@ -37,7 +40,6 @@
                 <tbody id="dataBody">
                     <!-- Aquí se insertarán las filas de datos -->
                 </tbody>
-
             </table>
         </div>
     </div>
@@ -47,9 +49,8 @@
         <button class="export-button" onclick="exportToExcel()">Exportar a Excel</button>
     </div>
 
-    <!-- Botón pequeño para ir al final de la página (en la esquina superior derecha) -->
+    <!-- Botones de scroll -->
     <button class="scrollButton smallButton topRight" onclick="scrollToBottom()">Ir al Final</button>
-    <!-- Botón pequeño para subir (en la esquina inferior derecha) -->
     <button class="scrollButton smallButton bottomRight" onclick="scrollToTop()">Subir</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
@@ -57,12 +58,10 @@
     <script src="scripts.js"></script>
 
     <script>
-        // Función para desplazarse hacia el final de la página
         function scrollToBottom() {
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
-        // Función para desplazarse hacia arriba de la página
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
