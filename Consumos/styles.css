@@ -1,363 +1,350 @@
-let data = []; // Variable para almacenar los datos procesados
-
-function processFile() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
-
-    if (!file) {
-        alert('Por favor selecciona un archivo.');
-        return;
-    }
-
-    // Validar el nombre del archivo
-    const fileName = file.name;
-    const isValid = validateFileName(fileName);
-
-    if (!isValid) {
-        alert('El archivo no corresponde con el formato esperado.\n' +
-              'El nombre debe comenzar con "T636876" y tener el formato correcto.\n' +
-              'Ejemplos: T636876811, T636876A01, T636876B15, T636876C20');
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const content = e.target.result;
-        processData(content);
-    };
-    reader.readAsText(file);
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 20px;
+    padding: 0;
+    background-image: url('../imagen/fondo.jpg');
+    background-repeat: repeat;
 }
 
-// Función para validar el nombre del archivo
-function validateFileName(fileName) {
-    const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
-
-    if (!nameWithoutExtension.startsWith('T636876')) {
-        return false;
-    }
-
-    const suffix = nameWithoutExtension.substring(7);
-
-    if (/^\d{3}$/.test(suffix)) {
-        const month = parseInt(suffix.substring(0, 1));
-        const day = parseInt(suffix.substring(1, 3));
-
-        if (month < 1 || month > 9) {
-            return false;
-        }
-
-        if (day < 1 || day > 31) {
-            return false;
-        }
-
-        return true;
-    }
-
-    if (/^[ABC]\d{2}$/.test(suffix)) {
-        const day = parseInt(suffix.substring(1, 3));
-
-        if (day < 1 || day > 31) {
-            return false;
-        }
-
-        return true;
-    }
-
-    return false;
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-// Función para formatear el valor en pesos colombianos
-function formatCOP(value) {
-    return '$' + value.toLocaleString('es-CO', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
+/* Estilos para los botones */
+button {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+    transition: opacity 0.5s ease;
 }
 
-// Función para formatear la fecha de YYYYMMDD a YYYY-MM-DD
-function formatDate(dateStr) {
-    if (dateStr.length === 8) {
-        return `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+button:hover {
+    background-color: #9DC7E4;
+    opacity: 0.8;
+}
+
+/* Estilos específicos para los botones de acción */
+.button {
+    background-color: #3498db;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin: 10px;
+}
+
+.button:hover {
+    background-color: #9DC7E4;
+    opacity: 0.8;
+}
+
+/* Estilos para los botones de exportación */
+.export-button {
+    background-color: #2ecc71;
+    color: white;
+    border-radius: 5px;
+    margin-top: 10px;
+    padding: 10px 20px;
+}
+
+.export-button:hover {
+    background-color: #27ae60;
+}
+
+/* Estilos para el contenedor de los botones */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Estilos para el contenedor del título */
+.titleContainer {
+    background-color: #e0e8f0;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    border: 1px solid #ddd;
+}
+
+/* Estilos para el contenedor del input y los botones */
+.file-button-container {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    width: 50%;
+    max-width: 400px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para el input de archivo */
+.file-input {
+    display: block;
+    margin: 20px auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 90%;
+    max-width: 100%;
+    font-size: 14px;
+    background-color: #fff;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+/* Estilos para el botón home */
+.home-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 10px 20px;
+    position: absolute;
+    left: 10px;
+}
+
+.home-button:hover {
+    background-color: #45a049;
+}
+
+/* Estilos para el contenedor de salida */
+.output-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-top: 20px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para la tabla */
+.table-container {
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+thead {
+    background-color: #3498db;
+    color: white;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+tfoot {
+    font-weight: bold;
+    background-color: #f2f2f2;
+}
+
+/* Estilos para los inputs y etiquetas */
+.file-input {
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+}
+
+/* Estilos para los botones de scroll */
+.scrollButton {
+    position: fixed;
+    background-color: #3498db;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.topRight {
+    top: 20px;
+    right: 20px;
+}
+
+.bottomRight {
+    bottom: 20px;
+    right: 20px;
+}
+
+.smallButton {
+    font-size: 14px;
+}
+
+/* ======================================== */
+/* ESTILOS PARA EL RESUMEN */
+/* ======================================== */
+.summary-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-height: 50px;
+    transition: all 0.3s ease;
+}
+
+/* Cuando el resumen está vacío, ocultar el borde y el fondo */
+.summary-container:empty {
+    display: none;
+}
+
+.summary-box h3 {
+    text-align: center;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 18px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-label {
+    font-weight: 500;
+    color: #34495e;
+}
+
+.summary-value {
+    font-weight: 600;
+    color: #2c3e50;
+    font-family: 'Courier New', monospace;
+}
+
+.total-row {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.total-row .summary-label {
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.total-row .summary-value {
+    font-size: 16px;
+    color: #0A39FA;
+}
+
+.summary-divider {
+    border-top: 2px dashed #bdc3c7;
+    margin: 8px 0;
+}
+
+/* Estilos para los diferentes totales en el resumen */
+.total-cargas .summary-value {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.total-archivo-menos .summary-value {
+    color: #f39c12;
+    font-weight: bold;
+}
+
+.total-archivo .summary-value {
+    color: #2980b9;
+    font-weight: bold;
+}
+
+.total-registros .summary-value {
+    color: #8e44ad;
+    font-weight: bold;
+}
+
+/* Estilo para la fila de total-archivo-menos */
+.total-archivo-menos {
+    background-color: #fef9e7;
+    border-radius: 3px;
+    padding: 6px 10px;
+}
+
+.total-archivo-menos .summary-label {
+    font-size: 15px;
+    color: #2c3e50;
+}
+
+.total-archivo-menos .summary-value {
+    font-size: 15px;
+    color: #f39c12;
+    font-weight: bold;
+}
+
+/* ======================================== */
+/* RESPONSIVE */
+/* ======================================== */
+@media (max-width: 768px) {
+    .summary-container {
+        width: 95%;
+        padding: 15px;
     }
-    return dateStr;
-}
-
-// Función para obtener el nombre del establecimiento
-function getEstablecimiento(uniqueCode, tipoMovimiento) {
-    if (uniqueCode === "00000000") {
-        if (tipoMovimiento && tipoMovimiento.toUpperCase().includes("CARGOS")) {
-            return "DESCARGA TARJETA COMFACAUCA";
-        } else if (tipoMovimiento && tipoMovimiento.toUpperCase().includes("ABONO")) {
-            return "CARGA TARJETA COMFACAUCA";
-        }
-        return "SIN COMERCIO";
+    
+    .summary-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
-
-    let codigoLimpio = uniqueCode;
-    if (codigoLimpio.startsWith("00")) {
-        codigoLimpio = codigoLimpio.substring(2);
+    
+    .summary-label {
+        margin-bottom: 4px;
     }
-
-    const nombre = comercios[codigoLimpio];
-    return nombre || "NO ENCONTRADO";
-}
-
-function processData(content) {
-    data = [];
-    const lines = content.split('\n');
-
-    lines.forEach(line => {
-        if (line.trim() !== '') {
-            const cardNumber = line.substring(9, 26).trim();
-            const rawValue = parseFloat(line.substring(124, 139).replace(/^0+/, '').trim().replace(/,/g, ""));
-            const date = line.substring(158, 166).trim();
-            const uniqueCode = line.substring(333, 341).trim();
-
-            let tipoMovimiento = "";
-            if (line.includes("CARGOS")) {
-                tipoMovimiento = "CARGOS";
-            } else if (line.includes("ABONO")) {
-                tipoMovimiento = "ABONO";
-            }
-
-            if (!isNaN(rawValue)) {
-                const establecimiento = getEstablecimiento(uniqueCode, tipoMovimiento);
-                const formattedValue = formatCOP(rawValue);
-                const formattedDate = formatDate(date);
-
-                data.push({
-                    cardNumber,
-                    value: formattedValue,
-                    rawValue,
-                    date: formattedDate,
-                    originalDate: date,
-                    uniqueCode,
-                    establecimiento,
-                    tipoMovimiento
-                });
-            }
-        }
-    });
-
-    sortDataByDate();
-    renderSummary();
-    renderTable();
-    calculateTotal();
-}
-
-// Función para mostrar el resumen del archivo
-function renderSummary() {
-    const summaryContainer = document.getElementById('summaryContainer');
-
-    const totalsByDate = {};
-    let totalCargas = 0;
-    let totalDescargas = 0;
-
-    data.forEach(item => {
-        if (!totalsByDate[item.date]) {
-            totalsByDate[item.date] = 0;
-        }
-        totalsByDate[item.date] += item.rawValue;
-
-        if (item.establecimiento === "CARGA TARJETA COMFACAUCA") {
-            totalCargas += item.rawValue;
-        } else if (item.establecimiento === "DESCARGA TARJETA COMFACAUCA") {
-            totalDescargas += item.rawValue;
-        }
-    });
-
-    const sortedDates = Object.keys(totalsByDate).sort();
-    const totalArchivo = data.reduce((acc, item) => acc + item.rawValue, 0);
-    const totalCargasDescargas = totalCargas + totalDescargas;
-    const totalArchivoMenosCargas = totalArchivo - totalCargasDescargas;
-    const totalRegistros = data.length;
-
-    let summaryHTML = `
-        <div class="summary-box">
-            <h3>RESUMEN ARCHIVO CONSUMOS CARGADO</h3>
-            <div class="summary-content">
-    `;
-
-    sortedDates.forEach(date => {
-        summaryHTML += `
-            <div class="summary-row">
-                <span class="summary-label">TOTAL DÍA: ${date}</span>
-                <span class="summary-value">${formatCOP(totalsByDate[date])}</span>
-            </div>
-        `;
-    });
-
-    summaryHTML += `
-                <div class="summary-divider"></div>
-                <div class="summary-row total-cargas">
-                    <span class="summary-label">TOTAL CARGAS-DESCARGAS</span>
-                    <span class="summary-value">${formatCOP(totalCargasDescargas)}</span>
-                </div>
-                <div class="summary-row total-archivo-menos">
-                    <span class="summary-label">TOTAL ARCHIVO - CARGAS/DESCARGAS</span>
-                    <span class="summary-value">${formatCOP(totalArchivoMenosCargas)}</span>
-                </div>
-                <div class="summary-row total-archivo">
-                    <span class="summary-label">TOTAL ARCHIVO</span>
-                    <span class="summary-value">${formatCOP(totalArchivo)}</span>
-                </div>
-                <div class="summary-row total-registros">
-                    <span class="summary-label">TOTAL REGISTROS</span>
-                    <span class="summary-value">${totalRegistros}</span>
-                </div>
-            </div>
-        </div>
-    `;
-
-    summaryContainer.innerHTML = summaryHTML;
-}
-
-// Función para ordenar los datos por fecha y luego por establecimiento
-function sortDataByDate() {
-    data.sort((a, b) => {
-        const dateA = `${a.originalDate.slice(0, 4)}${a.originalDate.slice(4, 6)}${a.originalDate.slice(6, 8)}`;
-        const dateB = `${b.originalDate.slice(0, 4)}${b.originalDate.slice(4, 6)}${b.originalDate.slice(6, 8)}`;
-        const dateCompare = parseInt(dateA) - parseInt(dateB);
-
-        if (dateCompare !== 0) {
-            return dateCompare;
-        }
-
-        const getPriority = (est) => {
-            if (est === "CARGA TARJETA COMFACAUCA" ||
-                est === "DESCARGA TARJETA COMFACAUCA") {
-                return 1;
-            }
-            return 0;
-        };
-
-        const priorityA = getPriority(a.establecimiento);
-        const priorityB = getPriority(b.establecimiento);
-
-        if (priorityA !== priorityB) {
-            return priorityA - priorityB;
-        }
-
-        return a.establecimiento.localeCompare(b.establecimiento);
-    });
-}
-
-// Función para mostrar los datos en la tabla
-function renderTable() {
-    const tableBody = document.getElementById('dataBody');
-    tableBody.innerHTML = '';
-
-    let rowNumber = 1;
-    const dates = Array.from(new Set(data.map(item => item.date)));
-
-    dates.forEach(date => {
-        const filteredData = data.filter(item => item.date === date);
-        filteredData.forEach(item => {
-            const row = tableBody.insertRow();
-            row.innerHTML = `
-                <td>${rowNumber}</td>
-                <td>${item.cardNumber}</td>
-                <td>${item.value}</td>
-                <td>${item.date}</td>
-                <td>${item.uniqueCode}</td>
-                <td>${item.establecimiento}</td>
-            `;
-            rowNumber++;
-        });
-
-        const total = filteredData.reduce((acc, item) => acc + item.rawValue, 0);
-        const totalRow = tableBody.insertRow();
-        totalRow.innerHTML = `
-            <td colspan="5" style="text-align: center; font-weight: bold; background-color: #f2f2f2;">TOTAL DÍA: ${date}</td>
-            <td style="text-align: center; font-weight: bold; background-color: #f2f2f2;">${formatCOP(total)}</td>
-        `;
-        totalRow.style.fontWeight = 'bold';
-        totalRow.style.backgroundColor = '#f2f2f2';
-    });
-}
-
-// Función para calcular el total de todos los datos
-function calculateTotal() {
-    const totalValue = data.reduce((acc, item) => acc + item.rawValue, 0);
-
-    const tableBody = document.getElementById('dataBody');
-    if (tableBody) {
-        const totalRow = tableBody.insertRow();
-        totalRow.innerHTML = `
-            <td colspan="6" style="text-align: center; font-weight: bold; background-color: #e8e8e8;">TOTAL ARCHIVO: ${formatCOP(totalValue)}</td>
-        `;
-        totalRow.style.fontWeight = 'bold';
-        totalRow.style.backgroundColor = '#e8e8e8';
+    
+    .file-button-container {
+        width: 90%;
     }
-}
-
-// Función para limpiar la tabla y el archivo seleccionado
-function clearTable() {
-    data = [];
-    const fileInput = document.getElementById('fileInput');
-    if (fileInput) {
-        fileInput.value = '';
+    
+    .output-container {
+        width: 95%;
+        padding: 10px;
     }
-
-    const dataBody = document.getElementById('dataBody');
-    if (dataBody) {
-        dataBody.innerHTML = '';
+    
+    table, th, td {
+        padding: 8px;
+        font-size: 12px;
     }
-
-    const summaryContainer = document.getElementById('summaryContainer');
-    if (summaryContainer) {
-        summaryContainer.innerHTML = '';
-    }
-}
-
-// Función para exportar los datos a CSV
-function exportToCSV() {
-    if (data.length === 0) {
-        alert('No hay datos para exportar.');
-        return;
-    }
-
-    let csvContent = "data:text/csv;charset=utf-8,"
-        + "N°,No. de Tarjeta,Valor,Fecha,Código Único,Establecimiento\n";
-
-    data.forEach((item, index) => {
-        csvContent += `${index + 1},${item.cardNumber},${item.rawValue},${item.date},${item.uniqueCode},"${item.establecimiento}"\n`;
-    });
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "data.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// Función para exportar los datos a Excel
-function exportToExcel() {
-    if (data.length === 0) {
-        alert('No hay datos para exportar.');
-        return;
-    }
-
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(data.map((item, index) => ({
-        "N°": index + 1,
-        "No. de Tarjeta": item.cardNumber,
-        "Valor": item.rawValue,
-        "Fecha": item.date,
-        "Código Único": item.uniqueCode,
-        "Establecimiento": item.establecimiento
-    })));
-    XLSX.utils.book_append_sheet(wb, ws, "Data");
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-
-    const blob = new Blob([wbout], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'data.xlsx');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }
