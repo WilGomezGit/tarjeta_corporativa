@@ -3,8 +3,8 @@ body {
     background-color: #f0f0f0;
     margin: 20px;
     padding: 0;
-    background-image: url('../imagen/fondo.jpg');
-    background-repeat: repeat;
+    background-image: url('../imagen/fondo.jpg'); /* Cambia esto a la ruta de tu imagen */
+    background-repeat: repeat; /* Repite la imagen en mosaico */
 }
 
 h1 {
@@ -278,22 +278,22 @@ tfoot {
 
 /* Estilos para los diferentes totales en el resumen */
 .total-cargas .summary-value {
-    color: #e74c3c;
+    color: #e74c3c; /* Rojo para cargas-descargas */
     font-weight: bold;
 }
 
 .total-archivo-menos .summary-value {
-    color: #f39c12;
+    color: #f39c12; /* Naranja para archivo menos cargas */
     font-weight: bold;
 }
 
 .total-archivo .summary-value {
-    color: #2980b9;
+    color: #2980b9; /* Azul para total archivo */
     font-weight: bold;
 }
 
 .total-registros .summary-value {
-    color: #8e44ad;
+    color: #8e44ad; /* Morado para registros */
     font-weight: bold;
 }
 
