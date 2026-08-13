@@ -29,7 +29,6 @@ button:hover {
     opacity: 0.8;
 }
 
-/* Estilos específicos para los botones de acción */
 .button {
     background-color: #3498db;
     color: white;
@@ -43,7 +42,6 @@ button:hover {
     opacity: 0.8;
 }
 
-/* Estilos para los botones de exportación */
 .export-button {
     background-color: #2ecc71;
     color: white;
@@ -56,7 +54,6 @@ button:hover {
     background-color: #27ae60;
 }
 
-/* Estilos para el contenedor de los botones */
 .button-container {
     display: flex;
     justify-content: center;
@@ -64,7 +61,6 @@ button:hover {
     margin-top: 20px;
 }
 
-/* Estilos para el contenedor del título */
 .titleContainer {
     background-color: #e0e8f0;
     padding: 10px;
@@ -75,7 +71,6 @@ button:hover {
     border: 1px solid #ddd;
 }
 
-/* Estilos para el contenedor del input y los botones */
 .file-button-container {
     background-color: #f0f0f0;
     padding: 10px;
@@ -88,7 +83,6 @@ button:hover {
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos para el input de archivo */
 .file-input {
     display: block;
     margin: 20px auto;
@@ -103,7 +97,6 @@ button:hover {
     cursor: pointer;
 }
 
-/* Estilos para el botón home */
 .home-button {
     background-color: #4CAF50;
     color: white;
@@ -119,7 +112,6 @@ button:hover {
     background-color: #45a049;
 }
 
-/* Estilos para el contenedor de salida */
 .output-container {
     background-color: #fff;
     padding: 20px;
@@ -132,7 +124,6 @@ button:hover {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos para la tabla */
 .table-container {
     width: 100%;
 }
@@ -154,14 +145,13 @@ thead {
     color: white;
 }
 
-/* RESALTAR FILAS AL PASAR EL MOUSE */
+/* RESALTAR FILAS DE LA TABLA AL PASAR EL MOUSE */
 tbody tr:hover {
     background-color: #d4edda !important;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
-/* Filas alternas con color */
 tbody tr:nth-child(even) {
     background-color: #f9f9f9;
 }
@@ -175,14 +165,12 @@ tfoot {
     background-color: #f2f2f2;
 }
 
-/* Estilos para los inputs y etiquetas */
 .file-input {
     display: block;
     margin: 20px auto;
     text-align: center;
 }
 
-/* Estilos para los botones de scroll */
 .scrollButton {
     position: fixed;
     background-color: #3498db;
@@ -249,6 +237,16 @@ tfoot {
     justify-content: space-between;
     padding: 6px 10px;
     border-bottom: 1px solid #f0f0f0;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+/* EFECTO HOVER PARA LAS FILAS DEL RESUMEN */
+.summary-row:hover {
+    background-color: #d4edda !important;
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
 }
 
 .summary-row:last-child {
@@ -258,12 +256,18 @@ tfoot {
 .summary-label {
     font-weight: 500;
     color: #34495e;
+    transition: color 0.3s ease;
+}
+
+.summary-row:hover .summary-label {
+    color: #2c3e50;
 }
 
 .summary-value {
     font-weight: 600;
     color: #2c3e50;
     font-family: 'Courier New', monospace;
+    transition: color 0.3s ease;
 }
 
 .total-row {
