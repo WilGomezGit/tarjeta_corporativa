@@ -53,57 +53,33 @@ function processData(content) {
 function fixEncoding(text) {
     let result = text;
 
-    // ============================================
-    // PASO 1: CORREGIR CASOS CON MÚLTIPLES Ã
-    // (Esto debe hacerse ANTES de los reemplazos individuales)
-    // ============================================
-
-    // Dos Ã se convierten en una Ñ
-    result = result.replace(/ÃÃ/g, 'Ñ');
-    // Tres Ã se convierten en una Ñ
-    result = result.replace(/ÃÃÃ/g, 'Ñ');
-
-    // ============================================
-    // PASO 2: CORREGIR CASOS ESPECÍFICOS
-    // ============================================
-
-    // CORREGIR MUÑOZ
-    result = result.replace(/MUÃOZ/g, 'MUÑOZ');
-    result = result.replace(/MUÃÃOZ/g, 'MUÑOZ');
-
-    // CORREGIR ZUÑIGA
-    result = result.replace(/ZUÃIGA/g, 'ZUÑIGA');
-    result = result.replace(/ZUÃÃIGA/g, 'ZUÑIGA');
-
-    // CORREGIR CASTAÑO
-    result = result.replace(/CASTAÃO/g, 'CASTAÑO');
-    result = result.replace(/CASTAÃÃO/g, 'CASTAÑO');
-
-    // ============================================
-    // PASO 3: CORREGIR CUALQUIER Ã RESTANTE
-    // ============================================
-
+    // Reemplazar cualquier combinación de Ã con Ñ
+    result = result.replace(/ÃƒÂ/g, 'Ñ');
+    result = result.replace(/ÃƒÂ/g, 'Ñ');
+    result = result.replace(/ÃÂ/g, 'Ñ');
     result = result.replace(/Ã/g, 'Ñ');
+    result = result.replace(/Ã/g, 'Ñ');
 
-    // ============================================
-    // PASO 4: CORREGIR TILDES
-    // ============================================
+    // Reemplazar cualquier combinación de Ã con ñ
+    result = result.replace(/ÃƒÂ±/g, 'ñ');
+    result = result.replace(/Ã±/g, 'ñ');
 
+    // Corregir casos específicos para evitar duplicados
+    result = result.replace(/MUÑOÑOZ/g, 'MUÑOZ');
+    result = result.replace(/MUOZ/g, 'MUÑOZ');
+    result = result.replace(/CASTAÑOÑO/g, 'CASTAÑO');
+    result = result.replace(/CASTAO/g, 'CASTAÑO');
+    result = result.replace(/ZUÑIÑIGA/g, 'ZUÑIGA');
+    result = result.replace(/ZUIGA/g, 'ZUÑIGA');
+
+    // Tildes
     result = result.replace(/Ã¡/g, 'á');
     result = result.replace(/Ã©/g, 'é');
     result = result.replace(/Ã­/g, 'í');
     result = result.replace(/Ã³/g, 'ó');
     result = result.replace(/Ãº/g, 'ú');
-    result = result.replace(/Ã‰/g, 'É');
-    result = result.replace(/Ã“/g, 'Ó');
-    result = result.replace(/Ãš/g, 'Ú');
-    result = result.replace(/Ã/g, 'Í');
-    result = result.replace(/Ã/g, 'Á');
 
-    // ============================================
-    // PASO 5: LIMPIAR CARACTERES SOBRANTES
-    // ============================================
-
+    // Limpiar caracteres sobrantes
     result = result.replace(/Â/g, '');
     result = result.replace(/â/g, '');
     result = result.replace(/€/g, '');
