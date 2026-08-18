@@ -38,7 +38,7 @@ function processData(content) {
         }
     });
 
-    // Eliminar duplicados exactos (mismo cedtar, nombres y bolsillo)
+    // Eliminar duplicados exactos
     data = removeDuplicates(data);
 
     // Ordenar alfabéticamente por nombres
@@ -57,31 +57,41 @@ function processData(content) {
 function removeDuplicates(arr) {
     const seen = new Set();
     return arr.filter(item => {
-        // Crear una clave única para cada registro
         const key = `${item.cedtar}|${item.nombres}|${item.bolsillo}`;
         if (seen.has(key)) {
-            return false; // Es duplicado, lo filtramos
+            return false;
         }
         seen.add(key);
-        return true; // Es único, lo mantenemos
+        return true;
     });
 }
 
 function fixEncoding(text) {
     let result = text;
 
-    // Reemplazar cualquier combinación de Ã con Ñ
+    // ============================================
+    // REEMPLAZAR ? POR Ñ (NUEVO)
+    // ============================================
+    result = result.replace(/\?/g, 'Ñ');
+
+    // ============================================
+    // REEMPLAZAR CUALQUIER COMBINACIÓN DE Ã CON Ñ
+    // ============================================
     result = result.replace(/ÃƒÂ/g, 'Ñ');
     result = result.replace(/ÃƒÂ/g, 'Ñ');
     result = result.replace(/ÃÂ/g, 'Ñ');
     result = result.replace(/Ã/g, 'Ñ');
     result = result.replace(/Ã/g, 'Ñ');
 
-    // Reemplazar cualquier combinación de Ã con ñ
+    // ============================================
+    // REEMPLAZAR CUALQUIER COMBINACIÓN DE Ã CON ñ
+    // ============================================
     result = result.replace(/ÃƒÂ±/g, 'ñ');
     result = result.replace(/Ã±/g, 'ñ');
 
-    // Corregir casos específicos para evitar duplicados
+    // ============================================
+    // CORREGIR CASOS ESPECÍFICOS
+    // ============================================
     result = result.replace(/MUÑOÑOZ/g, 'MUÑOZ');
     result = result.replace(/MUOZ/g, 'MUÑOZ');
     result = result.replace(/CASTAÑOÑO/g, 'CASTAÑO');
@@ -89,14 +99,18 @@ function fixEncoding(text) {
     result = result.replace(/ZUÑIÑIGA/g, 'ZUÑIGA');
     result = result.replace(/ZUIGA/g, 'ZUÑIGA');
 
-    // Tildes
+    // ============================================
+    // CORREGIR TILDES
+    // ============================================
     result = result.replace(/Ã¡/g, 'á');
     result = result.replace(/Ã©/g, 'é');
     result = result.replace(/Ã­/g, 'í');
     result = result.replace(/Ã³/g, 'ó');
     result = result.replace(/Ãº/g, 'ú');
 
-    // Limpiar caracteres sobrantes
+    // ============================================
+    // LIMPIAR CARACTERES SOBRANTES
+    // ============================================
     result = result.replace(/Â/g, '');
     result = result.replace(/â/g, '');
     result = result.replace(/€/g, '');
@@ -146,7 +160,6 @@ function exportToExcel(filteredData, filename) {
     // Eliminar duplicados en los datos a exportar
     const uniqueData = removeDuplicates(filteredData);
 
-    // SOLO 3 COLUMNAS: DOCUMENTO, NOMBRES, BOLSILLO
     const dataToExport = uniqueData.map(item => [
         item.cedtar,
         item.nombres,
@@ -207,10 +220,7 @@ function exportToFOSFEC() {
             bolsillo: item.bolsillo
         }));
 
-    // Eliminar duplicados
     filteredData = removeDuplicates(filteredData);
-
-    // Ordenar alfabéticamente por nombres
     filteredData.sort((a, b) => a.nombres.localeCompare(b.nombres, 'es', { sensitivity: 'base' }));
 
     if (filteredData.length === 0) {
@@ -237,10 +247,7 @@ function exportToSUBFLIAR() {
             bolsillo: item.bolsillo
         }));
 
-    // Eliminar duplicados
     filteredData = removeDuplicates(filteredData);
-
-    // Ordenar alfabéticamente por nombres
     filteredData.sort((a, b) => a.nombres.localeCompare(b.nombres, 'es', { sensitivity: 'base' }));
 
     if (filteredData.length === 0) {
