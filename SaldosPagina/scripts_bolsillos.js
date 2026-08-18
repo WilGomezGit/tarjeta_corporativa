@@ -38,6 +38,9 @@ function processData(content) {
         }
     });
 
+    // Eliminar duplicados exactos (mismo cedtar, nombres y bolsillo)
+    data = removeDuplicates(data);
+
     // Ordenar alfabéticamente por nombres
     data.sort((a, b) => {
         const bolsilloCompare = a.bolsillo.localeCompare(b.bolsillo);
@@ -48,6 +51,20 @@ function processData(content) {
     });
 
     renderTable();
+}
+
+// Función para eliminar duplicados
+function removeDuplicates(arr) {
+    const seen = new Set();
+    return arr.filter(item => {
+        // Crear una clave única para cada registro
+        const key = `${item.cedtar}|${item.nombres}|${item.bolsillo}`;
+        if (seen.has(key)) {
+            return false; // Es duplicado, lo filtramos
+        }
+        seen.add(key);
+        return true; // Es único, lo mantenemos
+    });
 }
 
 function fixEncoding(text) {
@@ -88,6 +105,7 @@ function fixEncoding(text) {
 
     return result;
 }
+
 function renderTable() {
     const tableBody = document.getElementById('dataBody');
     tableBody.innerHTML = '';
@@ -125,8 +143,11 @@ function exportToExcel(filteredData, filename) {
         return;
     }
 
-    // SOLO 3 COLUMNAS: DOCUMENTO, NOMBRES, BOLSILLO (SIN SALDO Y SIN ENCABEZADOS)
-    const dataToExport = filteredData.map(item => [
+    // Eliminar duplicados en los datos a exportar
+    const uniqueData = removeDuplicates(filteredData);
+
+    // SOLO 3 COLUMNAS: DOCUMENTO, NOMBRES, BOLSILLO
+    const dataToExport = uniqueData.map(item => [
         item.cedtar,
         item.nombres,
         item.bolsillo
@@ -178,14 +199,19 @@ function exportToFOSFEC() {
     const formattedDate = formatDate(yesterday);
     const fileName = `SaldosPagina a ${formattedDate} Fosfec.xlsx`;
 
-    const filteredData = data
+    let filteredData = data
         .filter(item => item.bolsillo === 'BONO ALIMENTACION FOSFEC' || item.bolsillo === 'FOSFEC')
         .map(item => ({
             cedtar: maskCedtar(item.cedtar),
             nombres: item.nombres,
             bolsillo: item.bolsillo
-        }))
-        .sort((a, b) => a.nombres.localeCompare(b.nombres, 'es', { sensitivity: 'base' }));
+        }));
+
+    // Eliminar duplicados
+    filteredData = removeDuplicates(filteredData);
+
+    // Ordenar alfabéticamente por nombres
+    filteredData.sort((a, b) => a.nombres.localeCompare(b.nombres, 'es', { sensitivity: 'base' }));
 
     if (filteredData.length === 0) {
         alert('No se encontraron datos para FOSFEC.');
@@ -203,14 +229,19 @@ function exportToSUBFLIAR() {
     const formattedDate = formatDate(yesterday);
     const fileName = `SaldosPagina a ${formattedDate} Subsidio.xlsx`;
 
-    const filteredData = data
+    let filteredData = data
         .filter(item => item.bolsillo === 'SUBSIDIO')
         .map(item => ({
             cedtar: maskCedtar(item.cedtar),
             nombres: item.nombres,
             bolsillo: item.bolsillo
-        }))
-        .sort((a, b) => a.nombres.localeCompare(b.nombres, 'es', { sensitivity: 'base' }));
+        }));
+
+    // Eliminar duplicados
+    filteredData = removeDuplicates(filteredData);
+
+    // Ordenar alfabéticamente por nombres
+    filteredData.sort((a, b) => a.nombres.localeCompare(b.nombres, 'es', { sensitivity: 'base' }));
 
     if (filteredData.length === 0) {
         alert('No se encontraron datos para SUBSIDIO.');
