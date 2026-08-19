@@ -23,7 +23,7 @@
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f0f0f0;
-  background-image: url('../imagen/fondo.jpg');  /* Ruta a la imagen de fondo */
+  background-image: url('../imagen/fondo.jpg');
   background-repeat: repeat;
   color: var(--text);
   line-height: 1.5;
@@ -31,7 +31,12 @@ body {
   padding: 0;
 }
 
-.container { max-width: 1280px; margin: 0 auto; padding: 20px; }
+/* Contenedor principal más ancho */
+.container {
+  max-width: 1600px;  /* Antes: 1280px */
+  margin: 0 auto;
+  padding: 20px;
+}
 
 /* ========== HEADER Y BOTÓN DE INICIO ========== */
 .app-header {
@@ -77,19 +82,6 @@ body {
   margin: 0;
 }
 
-/* Ajuste para que el texto no se solape con el botón en pantallas pequeñas */
-@media (max-width: 600px) {
-  .home-button {
-    position: static;
-    display: block;
-    margin: 0 auto 10px auto;
-    transform: none;
-  }
-  .header-container {
-    text-align: center;
-  }
-}
-
 /* ========== ACCIONES SUPERIORES ========== */
 .top-actions {
   display: flex;
@@ -102,7 +94,7 @@ body {
 /* ========== TARJETAS Y CARGAS ========== */
 .upload-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -167,7 +159,7 @@ body {
 /* ========== RESUMEN ========== */
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 12px;
 }
 
@@ -215,9 +207,18 @@ body {
 
 .checkbox { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
 
-.table-responsive { overflow-x: auto; }
+/* Contenedor de tabla con scroll horizontal solo si es necesario */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
-.table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 1200px;  /* Ancho mínimo para que todas las columnas se muestren sin comprimir */
+}
 
 .table th {
   background: #f9fafb;
@@ -336,3 +337,55 @@ tr.estado-inconsistencia td { background-color: #fef2f2; }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 900px) {
+  .container {
+    padding: 15px;
+  }
+
+  .upload-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .top-actions {
+    justify-content: center;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .table {
+    font-size: 0.8rem;
+    min-width: 1000px;  /* Sigue permitiendo scroll horizontal */
+  }
+}
+
+@media (max-width: 600px) {
+  .app-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .home-button {
+    position: static;
+    display: block;
+    margin: 0 auto 10px auto;
+    transform: none;
+  }
+
+  .summary-item strong {
+    font-size: 1.2rem;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+}
