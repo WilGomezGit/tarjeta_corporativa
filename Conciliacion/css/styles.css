@@ -181,10 +181,11 @@ body {
 }
 
 .summary-item strong {
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 1.8vw, 1.4rem);  /* Tamaño adaptable al ancho */
   font-weight: 700;
-  word-break: break-all;
-  overflow-wrap: anywhere;
+  white-space: nowrap;                    /* Evita saltos de línea */
+  overflow: hidden;
+  overflow: visible;                     /* No muestra puntos suspensivos si no cabe */
 }
 
 /* ========== TABLA ========== */
