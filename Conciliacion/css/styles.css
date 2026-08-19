@@ -337,6 +337,32 @@ tr.estado-inconsistencia td { background-color: #fef2f2; }
   margin: 0 auto;
 }
 
+
+/* Estilos para los botones de scroll */
+.scrollButton {
+    position: fixed;
+    background-color: #3498db;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.topRight {
+    top: 20px;
+    right: 20px;
+}
+
+.bottomRight {
+    bottom: 20px;
+    right: 20px;
+}
+
+.smallButton {
+    font-size: 14px;
+}
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ========== RESPONSIVE ========== */
