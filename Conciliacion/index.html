@@ -133,6 +133,25 @@
 
   <div id="toastContainer" class="toast-container"></div>
 
+      <!-- Botones de scroll -->
+    <button class="scrollButton smallButton topRight" onclick="scrollToBottom()">Ir al Final</button>
+    <button class="scrollButton smallButton bottomRight" onclick="scrollToTop()">Subir</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
+    <script src="comercios.js"></script>
+    <script src="scripts.js"></script>
+
+    <script>
+        function scrollToBottom() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
+
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/excel.js"></script>
