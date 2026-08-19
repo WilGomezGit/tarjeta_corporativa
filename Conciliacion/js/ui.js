@@ -200,16 +200,16 @@ const UI = (function () {
     }, 4500);
   }
 
-function formatoMoneda(valor) {
-  if (valor === null || valor === undefined || isNaN(valor)) return '—';
-  const numero = Number(valor);
-  const esNegativo = numero < 0;
-  const valorAbsoluto = Math.abs(numero).toFixed(2);
-  const [entero, decimal] = valorAbsoluto.split('.');
-  const enteroConPuntos = entero.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  const resultado = `$${enteroConPuntos},${decimal}`;
-  return esNegativo ? `-${resultado}` : resultado;
-}
+  function formatoMoneda(valor) {
+    if (valor === null || valor === undefined || isNaN(valor)) return '—';
+    const numero = Number(valor);
+    const esNegativo = numero < 0;
+    const valorAbsoluto = Math.abs(numero).toFixed(2);
+    const [entero, decimal] = valorAbsoluto.split('.');
+    const enteroConPuntos = entero.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    const resultado = `$${enteroConPuntos},${decimal}`;
+    return esNegativo ? `-${resultado}` : resultado;
+  }
 
   function escapeHtml(texto) {
     if (texto === null || texto === undefined) return '';
