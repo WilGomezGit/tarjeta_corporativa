@@ -31,9 +31,8 @@ body {
   padding: 0;
 }
 
-/* Contenedor principal más ancho */
 .container {
-  max-width: 1600px;  /* Antes: 1280px */
+  max-width: 1600px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -181,11 +180,10 @@ body {
 }
 
 .summary-item strong {
-  font-size: clamp(1rem, 1.8vw, 1.4rem);  /* Tamaño adaptable al ancho */
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
   font-weight: 700;
-  white-space: nowrap;                    /* Evita saltos de línea */
-  overflow: hidden;
-  overflow: visible;                     /* No muestra puntos suspensivos si no cabe */
+  white-space: nowrap;
+  overflow: visible;
 }
 
 /* ========== TABLA ========== */
@@ -208,7 +206,6 @@ body {
 
 .checkbox { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
 
-/* Contenedor de tabla con scroll horizontal solo si es necesario */
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -218,7 +215,7 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
-  min-width: 1200px;  /* Ancho mínimo para que todas las columnas se muestren sin comprimir */
+  min-width: 1200px;
 }
 
 .table th {
@@ -337,33 +334,41 @@ tr.estado-inconsistencia td { background-color: #fef2f2; }
   margin: 0 auto;
 }
 
-
-/* Estilos para los botones de scroll */
-.scrollButton {
-    position: fixed;
-    background-color: #3498db;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    z-index: 1000;
-}
-
-.topRight {
-    top: 20px;
-    right: 20px;
-}
-
-.bottomRight {
-    bottom: 20px;
-    right: 20px;
-}
-
-.smallButton {
-    font-size: 14px;
-}
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========== BOTONES DE SCROLL FLOTANTES ========== */
+.scroll-buttons-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column-reverse; /* "Subir" arriba, "Ir al Final" abajo */
+  gap: 10px;
+  z-index: 1000;
+}
+
+.scrollButton {
+  background-color: rgba(52, 152, 219, 0.85);
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, transform 0.2s;
+  white-space: nowrap;
+}
+
+.scrollButton:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+.scrollButton:active {
+  transform: translateY(0);
+}
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 900px) {
@@ -391,7 +396,7 @@ tr.estado-inconsistencia td { background-color: #fef2f2; }
 
   .table {
     font-size: 0.8rem;
-    min-width: 1000px;  /* Sigue permitiendo scroll horizontal */
+    min-width: 1000px;
   }
 }
 
@@ -414,5 +419,15 @@ tr.estado-inconsistencia td { background-color: #fef2f2; }
   .btn {
     padding: 10px 16px;
     font-size: 0.9rem;
+  }
+
+  .scroll-buttons-container {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .scrollButton {
+    padding: 8px 12px;
+    font-size: 12px;
   }
 }
