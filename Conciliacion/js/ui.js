@@ -1,5 +1,5 @@
 const UI = (function () {
-  let resultadosActuales = [];
+  let resultadosActuales = []; // Solo contendrá DIFERENCIAS
   let inconsistenciasActuales = [];
   let sortKey = 'documento';
   let sortDir = 'asc';
@@ -29,8 +29,7 @@ const UI = (function () {
       document.getElementById(id).addEventListener('input', renderTabla);
     });
 
-    document.getElementById('checkSoloDiferencias').addEventListener('change', renderTabla);
-    document.getElementById('btnLimpiarFiltros').addEventListener('click', limpiarFiltros);
+    // Ya no hay checkbox, se eliminó
   }
 
   function actualizarIconosOrden() {
@@ -46,7 +45,7 @@ const UI = (function () {
     document.getElementById('buscarDocumento').value = '';
     document.getElementById('buscarNombre').value = '';
     document.getElementById('buscarTarjeta').value = '';
-    document.getElementById('checkSoloDiferencias').checked = false;
+    // No hay checkbox que limpiar
     renderTabla();
   }
 
@@ -54,8 +53,8 @@ const UI = (function () {
     const textoDocumento = document.getElementById('buscarDocumento').value.trim().toLowerCase();
     const textoNombre = document.getElementById('buscarNombre').value.trim().toLowerCase();
     const textoTarjeta = document.getElementById('buscarTarjeta').value.trim().toLowerCase();
-    const soloDiferencias = document.getElementById('checkSoloDiferencias').checked;
 
+    // resultadosActuales YA SOLO CONTIENE DIFERENCIAS
     let datos = [...resultadosActuales];
 
     if (textoDocumento) {
@@ -66,9 +65,6 @@ const UI = (function () {
     }
     if (textoTarjeta) {
       datos = datos.filter((r) => String(r.tarjeta || '').toLowerCase().includes(textoTarjeta));
-    }
-    if (soloDiferencias) {
-      datos = datos.filter((r) => r.estado === 'DIFERENCIA');
     }
 
     datos.sort((a, b) => {
@@ -92,47 +88,65 @@ const UI = (function () {
   function renderTabla() {
     const datos = filtrarYOrdenar();
     const tbody = document.getElementById('tablaResultadosBody');
-    tbody.innerHTML = '';
 
     if (!datos.length) {
-      const fila = document.createElement('tr');
-      fila.innerHTML = '<td colspan="9" class="text-center">No hay registros para mostrar.</td>';
-      tbody.appendChild(fila);
-      actualizarContador(0);
-      return;
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay diferencias para mostrar.</td></tr>';
+        actualizarContador(0);
+        return;
     }
 
-    datos.forEach((resultado) => {
-      const fila = document.createElement('tr');
-      fila.className = `estado-${resultado.estado.toLowerCase()}`;
-      fila.setAttribute('title', resultado.detalle || '');
+    const total = datos.length;
+    const batchSize = 200;
+    let index = 0;
 
-      fila.innerHTML = `
-        <td>${escapeHtml(resultado.documento)}</td>
-        <td>${escapeHtml(resultado.nombre)}</td>
-        <td>${escapeHtml(resultado.tarjeta)}</td>
-        <td class="numeric">${formatoMoneda(resultado.saldoContabilidad)}</td>
-        <td class="numeric">${formatoMoneda(resultado.consumos)}</td>
-        <td class="numeric">${formatoMoneda(resultado.saldoAjustado)}</td>
-        <td class="numeric">${formatoMoneda(resultado.saldoTesoreria)}</td>
-        <td class="numeric">${formatoMoneda(resultado.diferencia)}</td>
-        <td><span class="badge badge-${estadoBadge[resultado.estado] || 'secondary'}">${resultado.estado}</span></td>
-      `;
+    function agregarLote() {
+        const fragment = document.createDocumentFragment();
+        const fin = Math.min(index + batchSize, total);
 
-      tbody.appendChild(fila);
-    });
+        for (let i = index; i < fin; i++) {
+            const resultado = datos[i];
+            const fila = document.createElement('tr');
+            fila.className = `estado-${resultado.estado.toLowerCase()}`;
+            fila.setAttribute('title', resultado.detalle || '');
 
-    actualizarContador(datos.length);
+            fila.innerHTML = `
+                <td>${escapeHtml(resultado.documento)}</td>
+                <td>${escapeHtml(resultado.nombre)}</td>
+                <td>${escapeHtml(resultado.tarjeta)}</td>
+                <td class="numeric">${formatoMoneda(resultado.saldoContabilidad)}</td>
+                <td class="numeric">${formatoMoneda(resultado.consumos)}</td>
+                <td class="numeric">${formatoMoneda(resultado.saldoAjustado)}</td>
+                <td class="numeric">${formatoMoneda(resultado.saldoTesoreria)}</td>
+                <td class="numeric">${formatoMoneda(resultado.diferencia)}</td>
+                <td><span class="badge badge-${estadoBadge[resultado.estado] || 'secondary'}">${resultado.estado}</span></td>
+            `;
+
+            fragment.appendChild(fila);
+        }
+
+        tbody.appendChild(fragment);
+        index = fin;
+
+        if (index < total) {
+            requestAnimationFrame(agregarLote);
+        } else {
+            actualizarContador(total);
+        }
+    }
+
+    actualizarContador(0);
+    requestAnimationFrame(agregarLote);
   }
 
   function actualizarContador(cantidad) {
     const total = resultadosActuales.length;
     document.getElementById('resultadosCount').textContent =
-      `Mostrando ${cantidad} de ${total} registros.`;
+      `Mostrando ${cantidad} de ${total} diferencias.`;
   }
 
   function mostrarResultados(resultados, inconsistencias) {
-    resultadosActuales = resultados || [];
+    // FILTRAR A SOLO DIFERENCIAS AQUÍ
+    resultadosActuales = (resultados || []).filter(r => r.estado === 'DIFERENCIA');
     inconsistenciasActuales = inconsistencias || [];
     sortKey = 'documento';
     sortDir = 'asc';
