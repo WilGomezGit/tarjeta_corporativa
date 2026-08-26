@@ -17,16 +17,34 @@ function processFile() {
     reader.readAsText(file);
 }
 
+// Función para formatear el valor en pesos colombianos
+function formatCOP(value) {
+    return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value);
+}
+
+// Procesa el contenido del archivo FIBATCH
 function processData(content) {
     data = []; // Limpiamos los datos anteriores
     const lines = content.split('\n');
 
-    // Procesamos todas las líneas excepto las dos últimas
+    // Procesamos todas las líneas excepto las dos últimas (dependiendo del formato)
     for (let i = 0; i < lines.length - 2; i++) {
         const line = lines[i].trim();
         if (line !== '') {
+            // Posiciones específicas para FIBATCH
             const documentNumber = line.substring(75, 94).trim();
-            const value = parseFloat(line.substring(179, 194).replace(/^0+/, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',').trim().replace(/,/g, ""));
+            const value = parseFloat(
+                line.substring(179, 194)
+                    .replace(/^0+/, '')
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                    .trim()
+                    .replace(/,/g, "")
+            );
             const commerce = line.substring(489, 550).trim();
 
             if (!isNaN(value)) {
@@ -42,16 +60,7 @@ function processData(content) {
     calculateTotal();
 }
 
-// MODIFICADO: Formatea un número como pesos colombianos con 2 decimales SIEMPRE
-function formatCOP(value) {
-    return new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-        minimumFractionDigits: 2, // MODIFICADO: de 0 a 2
-        maximumFractionDigits: 2  // MODIFICADO: de 0 a 2
-    }).format(value);
-}
-
+// Dibuja la tabla con los datos procesados
 function renderTable() {
     const tableBody = document.getElementById('dataBody');
     tableBody.innerHTML = '';
@@ -66,46 +75,44 @@ function renderTable() {
     });
 }
 
+// Calcula el total y lo muestra en ambos lugares (tabla y contenedor superior)
 function calculateTotal() {
     const totalValue = data.reduce((acc, item) => acc + item.value, 0);
 
+    // Actualizamos el total del pie de tabla
     document.getElementById('totalValue').textContent = formatCOP(totalValue);
+    // Actualizamos el total del contenedor superior
     document.getElementById('totalProcessedValue').textContent = formatCOP(totalValue);
 }
 
+// Limpia todo (tabla, totales, archivo y zona de drag & drop)
 function clearTable() {
-    // 1. Limpiar los datos
+    // Limpiar los datos
     data = [];
 
-    // 2. Limpiar la tabla
+    // Limpiar la tabla
     document.getElementById('dataBody').innerHTML = '';
 
-    // 3. Limpiar los totales
-    document.getElementById('totalValue').textContent = '';
-    document.getElementById('totalProcessedValue').textContent = '';
+    // Limpiar los totales
+    document.getElementById('totalValue').textContent = '$0,00';
+    document.getElementById('totalProcessedValue').textContent = '$0,00';
 
-    // 4. Limpiar el input file (resetear el valor)
+    // Limpiar el input file
     const fileInput = document.getElementById('fileInput');
-    fileInput.value = '';
+    if (fileInput) fileInput.value = '';
 
-    // 5. Limpiar el nombre del archivo mostrado
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    if (fileNameDisplay) {
-        fileNameDisplay.textContent = '';
-    }
-
-    // 6. Si usas un label personalizado para el input file
-    const fileLabel = document.querySelector('label[for="fileInput"]');
-    if (fileLabel) {
-        const originalText = fileLabel.getAttribute('data-original-text');
-        if (originalText) {
-            fileLabel.textContent = originalText;
-        } else {
-            fileLabel.textContent = 'Seleccionar archivo';
-        }
+    // Restaurar la zona de drag & drop
+    const dropZone = document.getElementById('dropZone');
+    if (dropZone) {
+        dropZone.classList.remove('file-loaded', 'dragover');
+        const dropTitle = dropZone.querySelector('.drop-title');
+        const dropSubtitle = dropZone.querySelector('.drop-subtitle');
+        if (dropTitle) dropTitle.innerHTML = 'Arrastra archivos aquí o haz clic para seleccionar';
+        if (dropSubtitle) dropSubtitle.innerHTML = 'Formatos soportados: .txt';
     }
 }
 
+// Exportar a CSV
 function exportToCSV() {
     if (data.length === 0) {
         alert('No hay datos para exportar.');
@@ -113,23 +120,21 @@ function exportToCSV() {
     }
 
     const csvContent = "data:text/csv;charset=utf-8,"
+        + "Número de Documento,Valor,Comercio\n"
         + data.map(item => {
-            const formattedItem = {
-                documentNumber: item.documentNumber,
-                value: formatCOP(item.value),
-                commerce: item.commerce
-            };
-            return Object.values(formattedItem).join(',');
+            return `${item.documentNumber},${item.value},"${item.commerce}"`;
         }).join('\n');
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "data.csv");
+    link.setAttribute("download", "fibatch.csv");
     document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 }
 
+// Exportar a Excel
 function exportToExcel() {
     if (data.length === 0) {
         alert('No hay datos para exportar.');
@@ -137,41 +142,13 @@ function exportToExcel() {
     }
 
     const formattedData = data.map(item => ({
-        documentNumber: item.documentNumber,
-        value: formatCOP(item.value),
-        commerce: item.commerce
+        "Número de Documento": item.documentNumber,
+        "Valor": item.value,
+        "Comercio": item.commerce
     }));
 
     const ws = XLSX.utils.json_to_sheet(formattedData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Datos");
-    XLSX.writeFile(wb, "data.xlsx");
-}
-
-function updateFileName(input) {
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    const fileLabel = document.querySelector('label[for="fileInput"]');
-
-    if (input.files && input.files[0]) {
-        const fileName = input.files[0].name;
-
-        if (fileNameDisplay) {
-            fileNameDisplay.textContent = fileName;
-        }
-
-        if (fileLabel) {
-            if (!fileLabel.getAttribute('data-original-text')) {
-                fileLabel.setAttribute('data-original-text', fileLabel.textContent);
-            }
-            fileLabel.textContent = fileName;
-        }
-    } else {
-        if (fileNameDisplay) {
-            fileNameDisplay.textContent = '';
-        }
-        if (fileLabel) {
-            const originalText = fileLabel.getAttribute('data-original-text');
-            fileLabel.textContent = originalText || 'Seleccionar archivo';
-        }
-    }
+    XLSX.writeFile(wb, "fibatch.xlsx");
 }
