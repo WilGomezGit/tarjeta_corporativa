@@ -3,50 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validador Archivos Personalización</title>
-    
-    <!-- FAVICON - Subimos un nivel con ../ -->
+    <title>Validar Archivos Personalización</title>
+
+    <!-- FAVICON -->
     <link rel="apple-touch-icon" sizes="180x180" href="../imagen/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../imagen/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../imagen/favicon-16x16.png">
     <link rel="manifest" href="../imagen/site.webmanifest">
-    
+
+    <!-- Fuentes e iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="overlay"></div>
 
-    <div class="titleContainer">
-        <button class="home-button" onclick="location.href='../index.html'">
-            &laquo Pagina Inicio
-        </button>
-        <h1>Validar Archivos Personalización</h1>
-    </div>
+    <div class="container">
+        <div class="content-box">
+            <div class="titleContainer">
+                <button class="home-button" onclick="location.href='../index.html'">
+                    <i class="fas fa-arrow-left"></i> Inicio
+                </button>
+                <h1>Validar Archivos Personalización</h1>
+            </div>
 
-    <div class="file-button-container">
-        <div class="file-actions">
-            <input
-                type="file"
-                id="fileInput"
-                accept=".txt"
-                class="file-input"
-            >
-            <button id="processButton" class="action-button">
-                Procesar Archivo
-            </button>
-            <button id="clearButton" class="action-button">
-                Cancelar
-            </button>
+            <!-- Zona de Drag & Drop -->
+            <div id="dropZone" class="drop-zone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p class="drop-title">Arrastra archivos aquí o haz clic para seleccionar</p>
+                <p class="drop-subtitle">Formatos soportados: .txt</p>
+                <input type="file" id="fileInput" class="file-input" accept=".txt" hidden>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="button-container">
+                <button id="processButton" class="button primary-button">
+                    <i class="fas fa-play"></i> Procesar Archivo
+                </button>
+                <button id="clearButton" class="button secondary-button">
+                    <i class="fas fa-eraser"></i> Cancelar
+                </button>
+            </div>
+
+            <!-- Contenedor de resultados -->
+            <div class="results-container">
+                <h2><i class="fas fa-clipboard-check"></i> Resultados de la Validación:</h2>
+                <div id="output" class="output">
+                    <!-- Aquí se insertarán los resultados -->
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="results-container">
-        <h2>Resultados de la Validación:</h2>
-        <div id="output" class="output">
-            <!-- Aquí se insertarán los resultados -->
-        </div>
+    <!-- Botones de scroll flotantes -->
+    <div class="scroll-buttons-container">
+        <button class="scrollButton" onclick="scrollToTop()">Subir</button>
+        <button class="scrollButton" onclick="scrollToBottom()">Ir al Final</button>
     </div>
 
     <script src="script.js"></script>
 
+    <script>
+        // Lógica Drag & Drop
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                fileInput.files = e.dataTransfer.files;
+                dropZone.classList.add('file-loaded');
+                dropZone.querySelector('.drop-title').innerHTML = `<i class="fas fa-check-circle"></i> ${file.name}`;
+                setTimeout(() => dropZone.classList.remove('file-loaded'), 1000);
+            }
+        });
+
+        // Click en la zona para abrir selector
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Mostrar nombre del archivo seleccionado
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                dropZone.classList.add('file-loaded');
+                const fileName = fileInput.files[0].name;
+                dropZone.querySelector('.drop-title').innerHTML = `<i class="fas fa-check-circle"></i> ${fileName}`;
+                setTimeout(() => dropZone.classList.remove('file-loaded'), 1000);
+            }
+        });
+
+        // Funciones de scroll
+        function scrollToBottom() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 </body>
 </html>
