@@ -3,61 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Procesador de Archivos</title>
+    <title>Procesador de Archivos de Consumos</title>
+
+    <!-- Fuentes modernas -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Iconos Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="titleContainer">
-        <button class="home-button" onclick="location.href='../index.html'">&laquo Pagina Inicio</button>
-        <h1>Procesador de Archivos de Consumos</h1>
-    </div>
+    <div class="overlay"></div>
 
-    <div class="file-button-container">
-        <input type="file" id="fileInput" class="file-input">
-        <div class="button-container">
-            <button class="button" onclick="processFile()">Procesar Archivo</button>
-            <button class="button" onclick="clearTable()">Limpiar Tabla</button>
+    <div class="container">
+        <div class="content-box">
+            <div class="titleContainer">
+                <button class="home-button" onclick="location.href='../index.html'">
+                    <i class="fas fa-arrow-left"></i> Inicio
+                </button>
+                <h1>Procesador de Archivos de Consumos</h1>
+            </div>
+
+            <!-- Área de Drag & Drop (Grande y unificada) -->
+	            <div id="dropZone" class="drop-zone">
+	                <i class="fas fa-cloud-upload-alt"></i>
+	                <p class="drop-title">Arrastra archivos aquí o haz clic para seleccionar</p>
+	                <p class="drop-subtitle">Formatos soportados: .txt</p>
+	                <input type="file" id="fileInput" class="file-input" accept=".txt,.csv" hidden>
+                </div>
+
+            <!-- Botones de acción -->
+            <div class="button-container">
+                <button class="button primary-button" onclick="processFile()">
+                    <i class="fas fa-play"></i> Procesar Archivo
+                </button>
+                <button class="button secondary-button" onclick="clearTable()">
+                    <i class="fas fa-eraser"></i> Limpiar Tabla
+                </button>
+            </div>
+
+            <!-- Contenedor del resumen -->
+            <div id="summaryContainer" class="summary-container"></div>
+
+            <!-- Contenedor de salida para la tabla -->
+            <div class="output-container">
+                <div class="table-container">
+                    <table id="dataTable" class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>No. de Tarjeta</th>
+                                <th>Valor</th>
+                                <th>Fecha</th>
+                                <th>Código Único</th>
+                                <th>Establecimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataBody">
+                            <!-- Aquí se insertarán las filas -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Botones de exportación -->
+            <div class="button-container export-buttons">
+                <button class="export-button" onclick="exportToCSV()">
+                    <i class="fas fa-file-csv"></i> Exportar CSV
+                </button>
+                <button class="export-button" onclick="exportToExcel()">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Contenedor del resumen -->
-    <div id="summaryContainer" class="summary-container"></div>
-
-    <!-- Contenedor de salida para la tabla -->
-    <div class="output-container">
-        <div class="table-container">
-            <table id="dataTable" class="styled-table">
-                <thead>
-                    <tr>
-                        <th>N°</th>
-                        <th>No. de Tarjeta</th>
-                        <th>Valor</th>
-                        <th>Fecha</th>
-                        <th>Código Único</th>
-                        <th>Establecimiento</th>
-                    </tr>
-                </thead>
-                <tbody id="dataBody">
-                    <!-- Aquí se insertarán las filas de datos -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="button-container">
-        <button class="export-button" onclick="exportToCSV()">Exportar a CSV</button>
-        <button class="export-button" onclick="exportToExcel()">Exportar a Excel</button>
-    </div>
-
-    <!-- Botones de scroll -->
-    <button class="scrollButton smallButton topRight" onclick="scrollToBottom()">Ir al Final</button>
-    <button class="scrollButton smallButton bottomRight" onclick="scrollToTop()">Subir</button>
+	<!-- Botones de scroll flotantes -->
+	<div class="scroll-buttons-container">
+		<button class="scrollButton" onclick="scrollToTop()">Subir</button>
+		<button class="scrollButton" onclick="scrollToBottom()">Ir al Final</button>
+	</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
     <script src="comercios.js"></script>
     <script src="scripts.js"></script>
 
     <script>
+        // Lógica Drag & Drop
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                fileInput.files = e.dataTransfer.files;
+                // Disparar animación de carga
+                dropZone.classList.add('file-loaded');
+                setTimeout(() => dropZone.classList.remove('file-loaded'), 1000);
+            }
+        });
+
+        // Click en la zona para abrir selector
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Mostrar nombre del archivo seleccionado
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                dropZone.classList.add('file-loaded');
+                const fileName = fileInput.files[0].name;
+                dropZone.querySelector('p').innerHTML = `<i class="fas fa-check-circle"></i> ${fileName}`;
+                setTimeout(() => dropZone.classList.remove('file-loaded'), 1000);
+            }
+        });
+
+        // Funciones de scroll
         function scrollToBottom() {
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
