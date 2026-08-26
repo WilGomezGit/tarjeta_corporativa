@@ -1,220 +1,359 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 20px;
+/* ====== Reset ====== */
+* {
+    box-sizing: border-box;
+    margin: 0;
     padding: 0;
-    background-image: url('../imagen/fondo.jpg'); /* Cambia esto a la ruta de tu imagen */
-    background-repeat: repeat; /* Repite la imagen en mosaico */
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-image: url('../imagen/fondo.jpg');
+    background-repeat: repeat;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Overlay azul corporativo */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.85) 0%, rgba(2, 132, 199, 0.75) 50%, rgba(8, 145, 178, 0.85) 100%);
+    z-index: -1;
+}
+
+/* Contenedor principal */
+.container {
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    flex: 1;
+}
+
+/* Tarjeta principal */
+.content-box {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* TÃ­tulo */
+.titleContainer {
+    position: relative;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
 }
 
 h1 {
-    text-align: center;
-    margin-bottom: 20px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #1e3a8a;
+    text-transform: uppercase;
+    letter-spacing: -1px;
 }
 
-/* Estilos para los botones */
-button {
-    background-color: #3498db;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-right: 10px;
-    transition: opacity 0.5s ease;
-}
-
-button:hover {
-    background-color: #9DC7E4;
-    opacity: 0.8;
-}
-
-/* Estilos específicos para los botones de acción */
-.button {
-    background-color: #3498db; /* Color de fondo de los botones */
-    color: white;
-    border-radius: 5px;
-    padding: 10px 20px;
-    margin: 10px; /* Ajusta el margen para separación */
-}
-
-.button:hover {
-    background-color: #9DC7E4;
-    opacity: 0.8;
-}
-
-/* Estilos para los botones de exportación */
-.export-button {
-    background-color: #2ecc71; /* Verde claro */
-    color: white;
-    border-radius: 5px;
-    margin-top: 10px;
-    padding: 10px 20px;
-}
-
-.export-button:hover {
-    background-color: #27ae60;
-}
-
-/* Estilos para el contenedor de los botones */
-.button-container {
-    text-align: center; /* Centra los botones */
-    margin-top: 20px; /* Ajusta el margen superior según sea necesario */
-}
-
-/* Estilos para el contenedor del título */
-.titleContainer {
-    background-color: #e0e8f0;
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
-    margin-bottom: 20px;
-    position: relative;
-    border: 1px solid #ddd; /* Borde gris claro alrededor del contenedor del título */
-}
-
-/* Estilos para el contenedor del input y los botones */
-.file-button-container {
-    background-color: #f0f0f0;
-    padding: 10px;
-    border-radius: 10px;
-    text-align: center;
-    margin: 20px auto; /* Centrar el contenedor */
-    border: 1px solid #ddd;
-    width: 50%; /* Ajustar el ancho del contenedor */
-    max-width: 400px; /* Ancho máximo para pantallas grandes */
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilos para el input de archivo */
-.file-input {
-    display: block;
-    margin: 20px auto;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 90%; /* Hacer que ocupe todo el ancho disponible */
-    max-width: 100%; /* Evitar que se desborde en pantallas pequeñas */
-    font-size: 14px;
-    background-color: #fff;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-}
-
-/* Estilos para el botón home */
 .home-button {
-    background-color: #4CAF50; /* Verde */
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
     color: white;
     border: none;
-    cursor: pointer;
-    border-radius: 5px;
     padding: 10px 20px;
-    position: absolute;
-    left: 20px;
+    border-radius: 50px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .home-button:hover {
-    background-color: #45a049;
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
 }
 
-/* Estilos para el contenedor de la tabla */
-.table-wrapper {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    margin-top: 20px;
-    width: 80%; /* Ajusta el ancho según sea necesario */
-    margin-left: auto;
-    margin-right: auto; /* Centra el contenedor en la página */
-}
-
-/* Estilos para la tabla */
-table {
-    width: 100%; /* Asegúrate de que la tabla ocupe todo el ancho del contenedor */
-    border-collapse: collapse;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
+/* ====== Zona de Drag & Drop (Grande, sin botones) ====== */
+.drop-zone {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 30px auto;
+    background: #f8fafc;
+    border: 3px dashed #94a3b8;
+    border-radius: 20px;
+    padding: 60px 30px;
     text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
-thead {
-    background-color: #3498db;
-    color: white;
-}
-
-tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-tfoot {
-    font-weight: bold;
-    background-color: #f2f2f2;
-}
-
-/* Estilos para los inputs y etiquetas */
-.file-input {
+.drop-zone i {
+    font-size: 4rem;
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
     display: block;
-    margin: 20px auto;
-    text-align: center;
 }
 
-/* Estilos para los botones de scroll */
-.scrollButton {
-    position: fixed;
-    background-color: #3498db; /* Color de fondo consistente */
-    color: white;
-    padding: 8px 16px;
+.drop-zone .drop-title {
+    font-size: 1.5rem;
+    color: #334155;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.drop-zone .drop-subtitle {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 400;
+    margin-bottom: 0;
+}
+
+.file-input {
+    display: none;
+}
+
+.drop-zone:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+    transform: scale(1.01);
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.15);
+}
+
+.drop-zone.dragover {
+    border-color: #2563eb;
+    background: #eff6ff;
+    transform: scale(1.03);
+    box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
+}
+
+.drop-zone.file-loaded {
+    animation: pulse 0.6s ease;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* ====== Botones ====== */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 500;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.primary-button {
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    color: white;
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+}
+
+.primary-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+}
+
+.secondary-button {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+}
+
+.secondary-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+}
+
+.export-button {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-size: 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.export-button:hover {
+    background: #059669;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+/* ====== Total FIBATCH ====== */
+.total-container {
+    max-width: 600px;
+    margin: 0 auto 30px auto;
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    color: white;
+    text-align: center;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(30, 58, 138, 0.4);
+}
+
+.total-container h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.total-container span {
+    font-size: 2rem;
+    font-weight: 800;
+    display: block;
+    margin-top: 5px;
+}
+
+/* ====== Tabla ====== */
+.output-container {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    overflow-x: auto;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+.styled-table thead {
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    color: white;
+}
+
+.styled-table th, .styled-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.styled-table tbody tr:hover {
+    background-color: #eff6ff;
+}
+
+.styled-table tfoot {
+    font-weight: bold;
+    background-color: #f8fafc;
+}
+
+/* ====== Export buttons ====== */
+.export-buttons {
+    margin-top: 35px;
+    margin-bottom: 10px;
+}
+
+/* ====== Botones de scroll flotantes ====== */
+.scroll-buttons-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
     z-index: 1000;
 }
 
-.topRight {
-    top: 20px;
-    right: 20px;
-}
-
-.bottomRight {
-    bottom: 20px;
-    right: 20px;
-}
-
-.smallButton {
+.scrollButton {
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    color: white;
+    border: 2px solid white;
+    padding: 10px 18px;
+    border-radius: 30px;
     font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
 }
 
-/* Estilos para el contenedor de salida */
-.output-container {
-    background-color: #ddd;
-    padding: 20px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    margin-top: 20px;
-    width: 80%; /* Ajusta el ancho según sea necesario */
-    margin-left: auto;
-    margin-right: auto; /* Centra el contenedor en la página */
+.scrollButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(135deg, #1e40af, #0284c7);
 }
 
-/* Estilo para el contenedor que muestra el total procesado */
-.total-container {
-    width: 350px; /* Ajusta el ancho del contenedor */
-    margin: 10px auto;  /* Ajusta el margen (centrado horizontal con 'auto') */
-    padding: 10px;  /* Ajusta el espacio interno */
-    background-color: #3498db;  /* Color de fondo */
-    color: white;  /* Color del texto */
-    text-align: center;  /* Centrar el texto */
-    border-radius: 3px;  /* Bordes redondeados */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);  /* Sombra del contenedor */
+.scrollButton:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Estilo del texto dentro del contenedor */
-.total-container h2 {
-    margin: 0;
-    font-size: 20px;  /* Tamaño del texto */
-    font-weight: normal;  /* Peso de la fuente */
+/* ====== Responsive ====== */
+@media (max-width: 768px) {
+    .content-box {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .home-button {
+        position: static;
+        transform: none;
+        margin-bottom: 15px;
+    }
+
+    .button-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button, .export-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .drop-zone {
+        padding: 40px 15px;
+    }
+
+    .drop-zone .drop-title {
+        font-size: 1.2rem;
+    }
 }
