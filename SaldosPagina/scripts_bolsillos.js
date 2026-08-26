@@ -139,16 +139,25 @@ function renderTable() {
     });
 }
 
+// LIMPIAR TODO (Incluyendo el Drag & Drop)
 function clearTable() {
     data = [];
+
     const fileInput = document.getElementById('fileInput');
-    if (fileInput) {
-        fileInput.value = '';
+    if (fileInput) fileInput.value = '';
+
+    // Restaurar la zona de drag & drop
+    const dropZone = document.getElementById('dropZone');
+    if (dropZone) {
+        dropZone.classList.remove('file-loaded', 'dragover');
+        const dropTitle = dropZone.querySelector('.drop-title');
+        const dropSubtitle = dropZone.querySelector('.drop-subtitle');
+        if (dropTitle) dropTitle.innerHTML = 'Arrastra archivos aquí o haz clic para seleccionar';
+        if (dropSubtitle) dropSubtitle.innerHTML = 'Formatos soportados: .txt, .csv';
     }
+
     const tableBody = document.getElementById('dataBody');
-    if (tableBody) {
-        tableBody.innerHTML = '';
-    }
+    if (tableBody) tableBody.innerHTML = '';
 }
 
 function exportToExcel(filteredData, filename) {
