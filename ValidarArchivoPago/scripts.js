@@ -24,9 +24,10 @@ function processData(content) {
     totalValue = 0; // Reiniciamos el valor total
     const lines = content.split('\n');
 
-    // Limpiar el contenedor de duplicados
-    const duplicatesContainer = document.getElementById('duplicatesContainer');
-    duplicatesContainer.innerHTML = '';
+    // Limpiar contenedores previos
+    document.getElementById('duplicatesContainer').innerHTML = '';
+    document.getElementById('lastLineContainer').innerHTML = '';
+    document.getElementById('summaryContainer').innerHTML = '';
 
     const documentNumbers = [];
     const cardNumbers = [];
@@ -77,8 +78,8 @@ function processData(content) {
     // Mostrar el total de la columna Valor
     displayTotal();
 
-    // Verificar duplicados
-    checkDuplicates(documentNumbers, cardNumbers, lineNumbersForDocuments, lineNumbersForCards);
+    // Verificar duplicados y generar el resumen
+    checkDuplicatesAndGenerateSummary(documentNumbers, cardNumbers, lineNumbersForDocuments, lineNumbersForCards);
 }
 
 function renderTable() {
@@ -97,35 +98,92 @@ function renderTable() {
     });
 }
 
-
 function renderLastLine() {
     const lastLineContainer = document.getElementById('lastLineContainer');
-    lastLineContainer.innerHTML = `<div style="text-align: center;">Valor de la última línea: ${lastLineData.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 })}</div>`;
+    if (lastLineData !== null && !isNaN(lastLineData)) {
+        const formatted = lastLineData.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 });
+        lastLineContainer.innerHTML = `<div style="text-align: center;">Valor de la última línea: ${formatted}</div>`;
+    } else {
+        lastLineContainer.innerHTML = '<div style="text-align: center;">Sin última línea válida</div>';
+    }
 }
 
 function displayTotal() {
     const totalValueContainer = document.getElementById('totalValue');
-    totalValueContainer.textContent = `Total: ${totalValue.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 })}`;
+    totalValueContainer.textContent = totalValue.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 });
 }
 
-function checkDuplicates(documentNumbers, cardNumbers, lineNumbersForDocuments, lineNumbersForCards) {
+// Nueva función para verificar duplicados y generar el resumen completo
+function checkDuplicatesAndGenerateSummary(documentNumbers, cardNumbers, lineNumbersForDocuments, lineNumbersForCards) {
     const duplicateDocuments = findDuplicates(documentNumbers);
     const duplicateCards = findDuplicates(cardNumbers);
 
-    let message = '';
-    if (duplicateDocuments.length > 0 || duplicateCards.length > 0) {
-        message += duplicateDocuments.length > 0 ? `Números de documentos Duplicados:\n\n` : '';
+    // Calcular diferencia
+    const diferencia = totalValue - (lastLineData || 0);
+
+    // Estado del archivo: Correcto si no hay duplicados y la diferencia es 0
+    const hayDuplicados = duplicateDocuments.length > 0 || duplicateCards.length > 0;
+    const diferenciaOK = Math.abs(diferencia) < 0.01;
+    const estadoCorrecto = !hayDuplicados && diferenciaOK;
+
+    // Mensaje de detalle de duplicados
+    let detalleDuplicados = '';
+    if (hayDuplicados) {
+        detalleDuplicados += 'DETALLE DE DUPLICADOS:\n';
         duplicateDocuments.forEach(doc => {
-            message += `Número de documento: ${doc}, líneas: ${lineNumbersForDocuments[doc].join(', ')}\n`;
+            detalleDuplicados += `Documento: ${doc} - Líneas: ${lineNumbersForDocuments[doc].join(', ')}\n`;
         });
-        message += duplicateCards.length > 0 ? `\nNúmeros de Tarjeta Duplicados:\n\n` : '';
         duplicateCards.forEach(card => {
-            message += `Número de tarjeta: ${card}, líneas: ${lineNumbersForCards[card].join(', ')}\n`;
+            detalleDuplicados += `Tarjeta: ${card} - Líneas: ${lineNumbersForCards[card].join(', ')}\n`;
         });
-        document.getElementById('duplicatesContainer').innerText = message;
     } else {
-        document.getElementById('duplicatesContainer').innerText = 'No se encontraron duplicados, Archivo correcto';
+        detalleDuplicados = 'No se encontraron duplicados.';
     }
+
+    // Construir HTML del resumen
+    const summaryHTML = `
+        <div class="summary-box">
+            <h3>RESUMEN ARCHIVO PROCESADO</h3>
+            <div class="summary-content">
+                <div class="summary-row">
+                    <span class="summary-label">Valor Total Archivo:</span>
+                    <span class="summary-value valor-total">${totalValue.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 })}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Valor Última Línea:</span>
+                    <span class="summary-value valor-ultima">${(lastLineData || 0).toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 })}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Diferencia:</span>
+                    <span class="summary-value diferencia">${diferencia.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 })}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Total Registros:</span>
+                    <span class="summary-value total-registros">${data.length}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Documentos Duplicados:</span>
+                    <span class="summary-value doc-duplicados">${duplicateDocuments.length}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Tarjetas Duplicadas:</span>
+                    <span class="summary-value tarj-duplicados">${duplicateCards.length}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Estado del Archivo:</span>
+                    <span class="summary-value ${estadoCorrecto ? 'estado-correcto' : 'estado-incorrecto'}">${estadoCorrecto ? 'ARCHIVO CORRECTO' : 'ARCHIVO INCORRECTO'}</span>
+                </div>
+            </div>
+
+            <!-- Detalle de duplicados -->
+            <div class="duplicados-detalle ${estadoCorrecto ? 'correcto' : ''}">
+                ${detalleDuplicados}
+            </div>
+        </div>
+    `;
+
+    // Insertar en el contenedor
+    document.getElementById('summaryContainer').innerHTML = summaryHTML;
 }
 
 function findDuplicates(arr) {
@@ -140,18 +198,39 @@ function findDuplicates(arr) {
     return duplicates;
 }
 
-// Función para limpiar la tabla
+// Función para limpiar todo
 function clearTable() {
-    data = []; // Limpiamos los datos
-    lastLineData = null; // Limpiamos la última línea
-    totalValue = 0; // Reiniciamos el total
+    data = [];
+    lastLineData = null;
+    totalValue = 0;
+
+    // Limpiar tabla
     document.getElementById('dataBody').innerHTML = '';
-    document.getElementById('totalValue').textContent = '';
+    // Limpiar total
+    document.getElementById('totalValue').textContent = '$0,00';
+    // Limpiar última línea
     document.getElementById('lastLineContainer').innerHTML = '';
-    document.getElementById('duplicatesContainer').innerHTML = ''; // Limpiar duplicados
+    // Limpiar duplicados
+    document.getElementById('duplicatesContainer').innerHTML = '';
+    // Limpiar resumen
+    document.getElementById('summaryContainer').innerHTML = '';
+
+    // Limpiar input file
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) fileInput.value = '';
+
+    // Restaurar zona de Drag & Drop
+    const dropZone = document.getElementById('dropZone');
+    if (dropZone) {
+        dropZone.classList.remove('file-loaded', 'dragover');
+        const dropTitle = dropZone.querySelector('.drop-title');
+        const dropSubtitle = dropZone.querySelector('.drop-subtitle');
+        if (dropTitle) dropTitle.innerHTML = 'Arrastra archivos aquí o haz clic para seleccionar';
+        if (dropSubtitle) dropSubtitle.innerHTML = 'Formatos soportados: .txt';
+    }
 }
 
-// Función para exportar los datos a CSV
+// Funciones de exportación
 function exportToCSV() {
     if (data.length === 0) {
         alert('No hay datos para exportar.');
@@ -165,12 +244,11 @@ function exportToCSV() {
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "data.csv");
-    document.body.appendChild(link); // Requerido para Firefox
-
-    link.click(); // Esto descargará el archivo de datos llamado "data.csv"
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
-// Función para exportar los datos a Excel
 function exportToExcel() {
     if (data.length === 0) {
         alert('No hay datos para exportar.');
@@ -191,8 +269,7 @@ function exportToExcel() {
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', 'data.xlsx');
-    document.body.appendChild(link); // Requerido para Firefox
-
-    link.click(); // Esto descargará el archivo de datos llamado "data.xlsx"
-    document.body.removeChild(link); // Limpiar
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
