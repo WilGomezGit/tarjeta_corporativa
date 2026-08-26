@@ -1,162 +1,195 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conciliación de Saldos de Terceros</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conciliación de Saldos de Terceros</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <header class="app-header">
-    <div class="container header-container">
-      <button class="home-button" onclick="location.href='../index.html'">&laquo Pagina Inicio</button>
-      <h1>Conciliación de Saldos de Terceros</h1>
-      <p>Procese archivos de Contabilidad, Tesorería y (opcional) Consumos para identificar diferencias.</p>
-    </div>
-  </header>
 
-  <main class="container">
-    <div class="top-actions">
-      <button id="btnReiniciar" class="btn btn-danger">Reiniciar</button>
-      <button id="btnDescargar" class="btn btn-success" hidden>Descargar Reporte de Diferencias</button>
-    </div>
+    <div class="container">
+        <div class="content-box">
+            <div class="titleContainer">
+                <button class="home-button" onclick="location.href='../index.html'">
+                    <i class="fas fa-arrow-left"></i> Inicio
+                </button>
+                <h1>Conciliación de Saldos de Terceros</h1>
+                <p>Procese archivos de Contabilidad, Tesorería y (opcional) Consumos para identificar diferencias.</p>
+            </div>
 
-    <section class="upload-grid">
-      <article class="card upload-card" id="card-contabilidad">
-        <div class="card-header">
-          <span class="icon">📁</span>
-          <h2>1. Archivo de Contabilidad</h2>
+            <!-- Zonas de carga con <label> (clic nativo) -->
+            <div class="upload-grid">
+
+                <!-- 1. Contabilidad -->
+                <article class="card upload-card" id="card-contabilidad">
+                    <div class="card-header"><span class="icon">📁</span><h2>1. Archivo de Contabilidad</h2></div>
+                    <label id="dropZone-contabilidad" class="drop-zone" for="inputContabilidad">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p class="drop-title">Arrastra archivo aquí o haz clic</p>
+                        <p class="drop-subtitle">Formatos: .xlsx, .xls, .csv</p>
+                    </label>
+                    <input type="file" id="inputContabilidad" accept=".xlsx,.xls,.csv" class="file-input" style="display: none;">
+                    <p id="estado-contabilidad" class="file-status">Sin cargar</p>
+                </article>
+
+                <!-- 2. Tesorería -->
+                <article class="card upload-card" id="card-tesoreria">
+                    <div class="card-header"><span class="icon">📁</span><h2>2. Archivo de Tesorería</h2></div>
+                    <label id="dropZone-tesoreria" class="drop-zone" for="inputTesoreria">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p class="drop-title">Arrastra archivo aquí o haz clic</p>
+                        <p class="drop-subtitle">Formatos: .xlsx, .xls, .csv</p>
+                    </label>
+                    <input type="file" id="inputTesoreria" accept=".xlsx,.xls,.csv" class="file-input" style="display: none;">
+                    <p id="estado-tesoreria" class="file-status">Sin cargar</p>
+                </article>
+
+                <!-- 3. Consumos (opcional) -->
+                <article class="card upload-card" id="card-consumos">
+                    <div class="card-header"><span class="icon">📁</span><h2>3. Archivo de Consumos (opcional)</h2></div>
+                    <label id="dropZone-consumos" class="drop-zone" for="inputConsumos">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p class="drop-title">Arrastra archivo aquí o haz clic</p>
+                        <p class="drop-subtitle">Formatos: .xlsx, .xls, .csv</p>
+                    </label>
+                    <input type="file" id="inputConsumos" accept=".xlsx,.xls,.csv" class="file-input" style="display: none;">
+                    <p id="estado-consumos" class="file-status">Sin cargar (opcional)</p>
+                </article>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="button-container">
+                <button id="btnProcesar" class="button primary-button"><i class="fas fa-play"></i> REALIZAR CONCILIACIÓN</button>
+                <button id="btnReiniciar" class="button secondary-button"><i class="fas fa-eraser"></i> Reiniciar</button>
+                <button id="btnDescargar" class="button export-button" hidden><i class="fas fa-download"></i> Descargar Reporte</button>
+            </div>
+
+            <!-- SECCIÓN: RESUMEN -->
+            <section id="resumenSection" class="card" hidden>
+                <h2>Resumen de Resultados</h2>
+                <div class="summary-grid">
+                    <div class="summary-item"><span>Contabilidad</span><strong id="resumenTercerosCont">0</strong></div>
+                    <div class="summary-item"><span>Tesorería</span><strong id="resumenTercerosTes">0</strong></div>
+                    <div class="summary-item"><span>Conciliados</span><strong id="resumenConciliados">0</strong></div>
+                    <div class="summary-item"><span>Diferencias</span><strong id="resumenDiferencias">0</strong></div>
+                    <div class="summary-item"><span>Consumos procesados</span><strong id="resumenConsumos">0</strong></div>
+                    <div class="summary-item"><span>Valor consumos</span><strong id="resumenValorConsumos">$0</strong></div>
+                    <div class="summary-item"><span>Inconsistencias</span><strong id="resumenInconsistencias">0</strong></div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: INCONSISTENCIAS -->
+            <section id="inconsistenciasSection" class="card" hidden>
+                <h2>Inconsistencias y Alertas</h2>
+                <div class="table-responsive">
+                    <table class="table table-sm" id="tablaInconsistencias">
+                        <thead>
+                            <tr><th>Tipo</th><th>Documento</th><th>Tarjeta</th><th>Detalle</th></tr>
+                        </thead>
+                        <tbody id="tablaInconsistenciasBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: TABLA DE RESULTADOS -->
+            <section id="resultadosSection" class="card" hidden>
+                <div class="section-header">
+                    <h2>Tabla de Resultados</h2>
+                </div>
+                <div class="filters">
+                    <input type="text" id="buscarDocumento" placeholder="Buscar documento">
+                    <input type="text" id="buscarNombre" placeholder="Buscar nombre">
+                    <input type="text" id="buscarTarjeta" placeholder="Buscar tarjeta">
+                </div>
+                <div class="table-responsive">
+                    <table id="tablaResultados" class="table">
+                        <thead>
+                            <tr>
+                                <th data-sort="documento">Documento</th>
+                                <th data-sort="nombre">Apellidos y Nombres</th>
+                                <th data-sort="tarjeta">No. Tarjeta</th>
+                                <th data-sort="saldoContabilidad" class="text-end">Saldo Contabilidad</th>
+                                <th data-sort="consumos" class="text-end">Consumos</th>
+                                <th data-sort="saldoAjustado" class="text-end">Saldo con Ajuste</th>
+                                <th data-sort="saldoTesoreria" class="text-end">Saldo Tesorería</th>
+                                <th data-sort="diferencia" class="text-end">Diferencia</th>
+                                <th data-sort="estado">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaResultadosBody"></tbody>
+                    </table>
+                </div>
+                <p class="table-count" id="resultadosCount"></p>
+            </section>
         </div>
-        <label class="file-select">
-          Seleccionar archivo
-          <input type="file" id="inputContabilidad" accept=".xlsx,.xls,.csv" />
-        </label>
-        <p id="estado-contabilidad" class="file-status">Sin cargar</p>
-      </article>
-
-      <article class="card upload-card" id="card-tesoreria">
-        <div class="card-header">
-          <span class="icon">📁</span>
-          <h2>2. Archivo de Tesorería</h2>
-        </div>
-        <label class="file-select">
-          Seleccionar archivo
-          <input type="file" id="inputTesoreria" accept=".xlsx,.xls,.csv" />
-        </label>
-        <p id="estado-tesoreria" class="file-status">Sin cargar</p>
-      </article>
-
-      <article class="card upload-card" id="card-consumos">
-        <div class="card-header">
-          <span class="icon">📁</span>
-          <h2>3. Archivo de Consumos (opcional)</h2>
-        </div>
-        <label class="file-select">
-          Seleccionar archivo
-          <input type="file" id="inputConsumos" accept=".xlsx,.xls,.csv" />
-        </label>
-        <p id="estado-consumos" class="file-status">Sin cargar (opcional)</p>
-      </article>
-    </section>
-
-    <div class="actions">
-      <button id="btnProcesar" class="btn btn-primary">REALIZAR CONCILIACIÓN</button>
     </div>
 
-    <section id="resumenSection" class="card" hidden>
-      <h2>Resumen de Resultados</h2>
-      <div class="summary-grid">
-        <div class="summary-item"><span>Contabilidad</span><strong id="resumenTercerosCont">0</strong></div>
-        <div class="summary-item"><span>Tesorería</span><strong id="resumenTercerosTes">0</strong></div>
-        <div class="summary-item"><span>Conciliados</span><strong id="resumenConciliados">0</strong></div>
-        <div class="summary-item"><span>Diferencias</span><strong id="resumenDiferencias">0</strong></div>
-        <div class="summary-item"><span>Consumos procesados</span><strong id="resumenConsumos">0</strong></div>
-        <div class="summary-item"><span>Valor consumos</span><strong id="resumenValorConsumos">$0</strong></div>
-        <div class="summary-item"><span>Inconsistencias</span><strong id="resumenInconsistencias">0</strong></div>
-      </div>
-    </section>
-
-    <section id="resultadosSection" class="card" hidden>
-      <div class="section-header">
-        <h2>Tabla de Resultados</h2>
-        <button id="btnLimpiarFiltros" class="btn btn-outline btn-sm">Limpiar filtros</button>
-      </div>
-      <div class="filters">
-        <input type="text" id="buscarDocumento" placeholder="Buscar documento" />
-        <input type="text" id="buscarNombre" placeholder="Buscar nombre" />
-        <input type="text" id="buscarTarjeta" placeholder="Buscar tarjeta" />
-        <label class="checkbox">
-          <input type="checkbox" id="checkSoloDiferencias" /> Solo diferencias
-        </label>
-      </div>
-      <div class="table-responsive">
-        <table id="tablaResultados" class="table">
-          <thead>
-            <tr>
-              <th data-sort="documento">Documento</th>
-              <th data-sort="nombre">Apellidos y Nombres</th>
-              <th data-sort="tarjeta">No. Tarjeta</th>
-              <th data-sort="saldoContabilidad" class="text-end">Saldo Contabilidad</th>
-              <th data-sort="consumos" class="text-end">Consumos</th>
-              <th data-sort="saldoAjustado" class="text-end">Saldo con Ajuste</th>
-              <th data-sort="saldoTesoreria" class="text-end">Saldo Tesorería</th>
-              <th data-sort="diferencia" class="text-end">Diferencia</th>
-              <th data-sort="estado">Estado</th>
-            </tr>
-          </thead>
-          <tbody id="tablaResultadosBody"></tbody>
-        </table>
-      </div>
-      <p class="table-count" id="resultadosCount"></p>
-    </section>
-
-    <section id="inconsistenciasSection" class="card" hidden>
-      <h2>Inconsistencias y Alertas</h2>
-      <div class="table-responsive">
-        <table class="table table-sm" id="tablaInconsistencias">
-          <thead>
-            <tr><th>Tipo</th><th>Documento</th><th>Tarjeta</th><th>Detalle</th></tr>
-          </thead>
-          <tbody id="tablaInconsistenciasBody"></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <div id="overlayProcesando" class="overlay" hidden>
-    <div class="overlay-content">
-      <div class="spinner"></div>
-      <p>Trabajando, por favor espere…</p>
+    <!-- Botones de scroll -->
+    <div class="scroll-buttons-container">
+        <button class="scrollButton" onclick="scrollToTop()">Subir</button>
+        <button class="scrollButton" onclick="scrollToBottom()">Ir al Final</button>
     </div>
-  </div>
 
-  <div id="toastContainer" class="toast-container"></div>
+    <!-- Overlay de procesamiento (oculto por defecto) -->
+    <div id="overlayProcesando" class="overlay" hidden>
+        <div class="overlay-content"><div class="spinner"></div><p>Trabajando, por favor espere…</p></div>
+    </div>
 
-  <!-- Botones de scroll flotantes -->
-  <div class="scroll-buttons-container">
-    <button class="scrollButton" onclick="scrollToTop()">Subir</button>
-    <button class="scrollButton" onclick="scrollToBottom()">Ir al Final</button>
-  </div>
+    <div id="toastContainer" class="toast-container"></div>
 
-  <!-- Librería SheetJS (única carga) -->
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  
-  <!-- Scripts de la aplicación -->
-  <script src="js/ui.js"></script>
-  <script src="js/excel.js"></script>
-  <script src="js/conciliacion.js"></script>
-  <script src="js/app.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/excel.js"></script>
+    <script src="js/conciliacion.js"></script>
+    <script src="js/app.js"></script>
 
-  <!-- Funciones para los botones de scroll -->
-  <script>
-    function scrollToBottom() {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }
+    <script>
+        const zonas = [
+            { drop: 'dropZone-contabilidad', input: 'inputContabilidad' },
+            { drop: 'dropZone-tesoreria', input: 'inputTesoreria' },
+            { drop: 'dropZone-consumos', input: 'inputConsumos' }
+        ];
 
-    function scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  </script>
+        zonas.forEach(z => {
+            const dropZone = document.getElementById(z.drop);
+            const input = document.getElementById(z.input);
+
+            ['dragenter', 'dragover'].forEach(ev => {
+                dropZone.addEventListener(ev, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.add('dragover');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(ev => {
+                dropZone.addEventListener(ev, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.remove('dragover');
+                });
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    input.files = dataTransfer.files;
+                    input.dispatchEvent(new Event('change'));
+                    dropZone.classList.add('file-loaded');
+                    dropZone.querySelector('.drop-title').innerHTML = `<i class="fas fa-check-circle"></i> ${file.name}`;
+                    setTimeout(() => dropZone.classList.remove('file-loaded'), 1000);
+                }
+            });
+        });
+
+        function scrollToBottom() { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    </script>
 </body>
 </html>
