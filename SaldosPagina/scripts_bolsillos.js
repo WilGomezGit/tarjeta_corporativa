@@ -1,5 +1,22 @@
-let data = []; // Variable para almacenar los datos procesados
+let data = [];          // Datos finales (sin duplicados, con máscara)
+let rawData = [];       // Datos completos (con duplicados, sin máscara) para verificación
 
+// ============================================
+// MOSTRAR / OCULTAR LOADING
+// ============================================
+function showLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'flex';
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+// ============================================
+// PROCESAR ARCHIVO
+// ============================================
 function processFile() {
     const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
@@ -9,17 +26,25 @@ function processFile() {
         return;
     }
 
+    showLoading();
     const reader = new FileReader();
     reader.onload = function(e) {
         const content = e.target.result;
         processData(content);
+        hideLoading();
     };
     reader.readAsText(file);
 }
 
+// ============================================
+// PROCESAMIENTO DE DATOS
+// ============================================
 function processData(content) {
+    rawData = [];
     data = [];
-    const lines = content.split('\n');
+
+    // Omitir la primera línea (cabecera)
+    const lines = content.split('\n').slice(1);
 
     lines.forEach(line => {
         if (line.trim() !== '') {
@@ -32,28 +57,25 @@ function processData(content) {
                 const saldo = parseFloat(saldoStr);
 
                 if (!isNaN(saldo)) {
-                    data.push({ cedtar, nombres, bolsillo, saldo });
+                    // Guardar TODOS los datos (incluye duplicados) para verificación
+                    rawData.push({ cedtar, nombres, bolsillo, saldo });
                 }
             }
         }
     });
 
-    // Eliminar duplicados exactos
-    data = removeDuplicates(data);
+    // Eliminar duplicados exactos (mismo documento, nombre y bolsillo)
+    data = removeDuplicates(rawData);
 
-    // Ordenar alfabéticamente por nombres
-    data.sort((a, b) => {
-        const bolsilloCompare = a.bolsillo.localeCompare(b.bolsillo);
-        if (bolsilloCompare !== 0) {
-            return bolsilloCompare;
-        }
-        return a.nombres.localeCompare(b.nombres, 'es', { sensitivity: 'base' });
-    });
+    // Ordenar alfabéticamente por nombres (sin agrupar por bolsillo)
+    data.sort((a, b) => a.nombres.localeCompare(b.nombres, 'es', { sensitivity: 'base' }));
 
     renderTable();
 }
 
-// Función para eliminar duplicados
+// ============================================
+// ELIMINAR DUPLICADOS (por documento, nombre y bolsillo)
+// ============================================
 function removeDuplicates(arr) {
     const seen = new Set();
     return arr.filter(item => {
@@ -66,32 +88,27 @@ function removeDuplicates(arr) {
     });
 }
 
+// ============================================
+// CORRECCIÓN DE ENCODING (ampliada)
+// ============================================
 function fixEncoding(text) {
     let result = text;
 
-    // ============================================
-    // REEMPLAZAR ? POR Ñ (NUEVO)
-    // ============================================
+    // Reemplazar ? por Ñ
     result = result.replace(/\?/g, 'Ñ');
 
-    // ============================================
-    // REEMPLAZAR CUALQUIER COMBINACIÓN DE Ã CON Ñ
-    // ============================================
+    // Reemplazar combinaciones de Ã con Ñ
     result = result.replace(/ÃƒÂ/g, 'Ñ');
     result = result.replace(/ÃƒÂ/g, 'Ñ');
     result = result.replace(/ÃÂ/g, 'Ñ');
     result = result.replace(/Ã/g, 'Ñ');
     result = result.replace(/Ã/g, 'Ñ');
 
-    // ============================================
-    // REEMPLAZAR CUALQUIER COMBINACIÓN DE Ã CON ñ
-    // ============================================
+    // Reemplazar combinaciones de Ã con ñ
     result = result.replace(/ÃƒÂ±/g, 'ñ');
     result = result.replace(/Ã±/g, 'ñ');
 
-    // ============================================
-    // CORREGIR CASOS ESPECÍFICOS
-    // ============================================
+    // Casos específicos
     result = result.replace(/MUÑOÑOZ/g, 'MUÑOZ');
     result = result.replace(/MUOZ/g, 'MUÑOZ');
     result = result.replace(/CASTAÑOÑO/g, 'CASTAÑO');
@@ -99,18 +116,22 @@ function fixEncoding(text) {
     result = result.replace(/ZUÑIÑIGA/g, 'ZUÑIGA');
     result = result.replace(/ZUIGA/g, 'ZUÑIGA');
 
-    // ============================================
-    // CORREGIR TILDES
-    // ============================================
+    // Tildes
     result = result.replace(/Ã¡/g, 'á');
     result = result.replace(/Ã©/g, 'é');
     result = result.replace(/Ã­/g, 'í');
     result = result.replace(/Ã³/g, 'ó');
     result = result.replace(/Ãº/g, 'ú');
 
-    // ============================================
-    // LIMPIAR CARACTERES SOBRANTES
-    // ============================================
+    // Tildes adicionales
+    result = result.replace(/Ã¼/g, 'ü');
+    result = result.replace(/Ã¤/g, 'ä');
+    result = result.replace(/Ã¶/g, 'ö');
+    result = result.replace(/Ã§/g, 'ç');
+    result = result.replace(/Ã¨/g, 'è');
+    result = result.replace(/Ã /g, ' ');
+
+    // Limpiar caracteres sobrantes
     result = result.replace(/Â/g, '');
     result = result.replace(/â/g, '');
     result = result.replace(/€/g, '');
@@ -120,6 +141,9 @@ function fixEncoding(text) {
     return result;
 }
 
+// ============================================
+// RENDERIZAR TABLA EN PANTALLA
+// ============================================
 function renderTable() {
     const tableBody = document.getElementById('dataBody');
     tableBody.innerHTML = '';
@@ -139,14 +163,16 @@ function renderTable() {
     });
 }
 
-// LIMPIAR TODO (Incluyendo el Drag & Drop)
+// ============================================
+// LIMPIAR TODO (Incluyendo Drag & Drop)
+// ============================================
 function clearTable() {
     data = [];
+    rawData = [];
 
     const fileInput = document.getElementById('fileInput');
     if (fileInput) fileInput.value = '';
 
-    // Restaurar la zona de drag & drop
     const dropZone = document.getElementById('dropZone');
     if (dropZone) {
         dropZone.classList.remove('file-loaded', 'dragover');
@@ -160,16 +186,16 @@ function clearTable() {
     if (tableBody) tableBody.innerHTML = '';
 }
 
+// ============================================
+// EXPORTAR EXCEL (genérico)
+// ============================================
 function exportToExcel(filteredData, filename) {
     if (filteredData.length === 0) {
         alert('No hay datos para exportar.');
         return;
     }
 
-    // Eliminar duplicados en los datos a exportar
-    const uniqueData = removeDuplicates(filteredData);
-
-    const dataToExport = uniqueData.map(item => [
+    const dataToExport = filteredData.map(item => [
         item.cedtar,
         item.nombres,
         item.bolsillo
@@ -206,6 +232,9 @@ function exportToExcel(filteredData, filename) {
     setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 }
 
+// ============================================
+// ENMASCARAR CÉDULA (6 asteriscos + últimos 3 dígitos)
+// ============================================
 function maskCedtar(cedtar) {
     if (!cedtar) return '';
     const str = cedtar.toString();
@@ -213,7 +242,11 @@ function maskCedtar(cedtar) {
     return '******' + str.slice(-3);
 }
 
+// ============================================
+// EXPORTAR SALDOS FOSFEC (con duplicados eliminados y máscara)
+// ============================================
 function exportToFOSFEC() {
+    showLoading();
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
@@ -234,13 +267,19 @@ function exportToFOSFEC() {
 
     if (filteredData.length === 0) {
         alert('No se encontraron datos para FOSFEC.');
+        hideLoading();
         return;
     }
 
     exportToExcel(filteredData, fileName);
+    setTimeout(hideLoading, 500);
 }
 
+// ============================================
+// EXPORTAR SALDOS SUBSIDIO (con duplicados eliminados y máscara)
+// ============================================
 function exportToSUBFLIAR() {
+    showLoading();
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
@@ -261,12 +300,46 @@ function exportToSUBFLIAR() {
 
     if (filteredData.length === 0) {
         alert('No se encontraron datos para SUBSIDIO.');
+        hideLoading();
         return;
     }
 
     exportToExcel(filteredData, fileName);
+    setTimeout(hideLoading, 500);
 }
 
+// ============================================
+// EXPORTAR VERIFICACIÓN (con duplicados y SIN asteriscos)
+// ============================================
+function exportToVerification() {
+    showLoading();
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const formattedDate = formatDate(yesterday);
+    const fileName = `SaldosVerificacion a ${formattedDate}.xlsx`;
+
+    // Usar TODOS los datos originales (con duplicados, sin máscara)
+    const allData = rawData.map(item => ({
+        cedtar: item.cedtar,
+        nombres: item.nombres,
+        bolsillo: item.bolsillo
+    }));
+
+    if (allData.length === 0) {
+        alert('No hay datos para exportar.');
+        hideLoading();
+        return;
+    }
+
+    exportToExcel(allData, fileName);
+    setTimeout(hideLoading, 500);
+}
+
+// ============================================
+// FORMATO DE FECHA (dd-mm-yyyy)
+// ============================================
 function formatDate(date) {
     const day = ('0' + date.getDate()).slice(-2);
     const month = ('0' + (date.getMonth() + 1)).slice(-2);
