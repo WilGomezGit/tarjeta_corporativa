@@ -75,6 +75,13 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Botón de verificación (con duplicados y sin asteriscos) -->
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="export-button" onclick="exportToVerification()">
+                    <i class="fas fa-file-excel"></i> Descargar Excel Verificación (con duplicados, sin asteriscos)
+                </button>
+            </div>
         </div>
     </div>
 
@@ -82,6 +89,14 @@
     <div class="scroll-buttons-container">
         <button class="scrollButton" onclick="scrollToTop()">Subir</button>
         <button class="scrollButton" onclick="scrollToBottom()">Ir al Final</button>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <span class="spinner">🔄</span>
+            <p>Procesando... Por favor espere...</p>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
